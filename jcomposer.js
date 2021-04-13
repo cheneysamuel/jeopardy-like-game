@@ -33,22 +33,18 @@ $(document).ready(function() {
   document.getElementById('numOfRowsField').addEventListener('change', changeNumOfRows, false);
   document.getElementById('roundNameField').addEventListener('change', updateRoundName, false);
 
-  document.getElementById('qaValue').addEventListener('change', validateNum, false);
+  document.getElementById('qaPoints').addEventListener('change', validateNum, false);
+  document.getElementById('qaTimerInSeconds').addEventListener('change', validateNum, false);
   
-  
-  qaAnswerField = document.getElementById('qaAnswer');
-  qaQuestionField = document.getElementById('qaQuestion');
-  qaSourceField = document.getElementById('qaSource');
-  
-  /*
-  qaAnswerField.oninput = function(){saveAllFields()};
-  qaQuestionField.oninput = function(){saveAllFields()};
-  qaSourceField.oninput = function(){saveAllFields()};
-  */
-  
-  qaAnswerField.onfocus = function(){selectIfDefault(this)};
-  qaQuestionField.onfocus = function(){selectIfDefault(this)};
-  qaSourceField.onfocus = function(){selectIfDefault(this)};
+  let finalAnswerField = document.getElementById('finalAnswerField');
+  let finalQuestionField = document.getElementById('finalQuestionField');
+  let finalSourceField = document.getElementById('finalSourceField');
+  let finalCommentsField = document.getElementById('finalCommentsField');
+
+  let qaAnswerField = document.getElementById('qaAnswer');
+  let qaQuestionField = document.getElementById('qaQuestion');
+  let qaSourceField = document.getElementById('qaSource');
+  let qaCommentsField = document.getElementById('qaComments');
 
 
   enableEditRound(false);
@@ -70,7 +66,8 @@ function GameOb() {
   this.rounds = [];
 
   this.addRound = function() {
-    this.rounds.push(new roundOb(roundCounter++, new roundInfoOb("aaa", 2, ["firstCat", "secondCat"]), []));
+    this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
+    roundCounter++;
   }
 }
 
@@ -79,103 +76,62 @@ function GameInfoOb() {
   this.creator = "creator";
   this.dateCreated = "date created";
   this.comments = "comments.";
+  this.backgroundColor = "#0000FF";
+  this.fontColor = "#FFFFFF";
 }
 
 
 function roundOb(id, info, data) {
   this.roundID = id;
   this.roundInfo = info;
-  this.roundData = data;
+  this.categories = [];
 
-  this.addRoundData = function() {
-    this.roundData.push(new QAob(true, 0, 0, 100, "answer", "question", "source", false));
-  }
+   this.addCategory = function() {
+     this.categories.push(new categoryOb("New Category"));
+   }
 }
 
 
-function roundInfoOb(_roundName, _numOfQuestionRows, _columnTitles) {
+function roundInfoOb(_roundName, _numOfQuestionRows) {
   this.roundName = _roundName;
   this.numberOfQuestionRows = _numOfQuestionRows;
-  this.columnTitles = _columnTitles;
   this.finalJeopardyIncluded = false;
-  this.finalJeopardy = new finalJ("Xanswer", "Xquestion", "Xsource");
+  this.finalJeopardy = new finalJ("", "", "", "");
 }
 
 
-function QAob(_selectable, _category, _pos, _value, _answer, _question, _source, _isDailyDouble) {
+function categoryOb(_title){
+    this.title = _title;
+    this.qaObs = [];
+    this.addQAob = function(pos, val){
+        this.qaObs.push(new QAob(true, pos, val, 30, "", "", "", "", false));
+    }
+}
+
+
+function QAob(_selectable, _pos, _points, _timerInSeconds, _answer, _question, _source, _comments, _isDailyDouble) {
   this.selectable = _selectable;
-  this.category = _category;
   this.pos = _pos;
-  this.value = _value;
+  this.points = _points;
+  this.timerInSeconds = _timerInSeconds;
   this.answer = _answer;
   this.question = _question;
   this.source = _source;
+  this.comments = _comments;
   this.isDailyDouble = _isDailyDouble;
 }
 
 
-function finalJ(_answer, _question, _source) {
+function finalJ(_answer, _question, _source, _comments) {
   this.answer = _answer;
   this.question = _question;
   this.source = _source;
+  this.comments = _comments;
 }
 
 
 
-let gameOb = new GameOb("ET1", "now", "none.");
-
-
-
-// not used right now until you care enough to turn the table into an actual flex div grid:
-function generateGameBoard(roundOb) {
-
-  // take the gameObject given and generate the game board:
-
-  //	alert("generating on round: " + roundOb.roundID);
-
-  let gridString = "";
-
-  // for each category, add a column:
-  for (var i = 0; i < roundOb.roundInfo.columnTitles.length; i++) {
-    gridString = gridString.concat("<div class='grid-column' id='cat" + i + "' >");
-
-    // in each of the columns, fill with individual divs, having the 
-    for (var j = 0; j < roundOb.roundInfo.numberOfQuestionRows + 1; j++) {
-
-      gridString = gridString.concat("<div class='grid-cell' ");
-
-      if (j == 0) {
-        // we have a column title. add the column title:
-        gridString = gridString.concat("id='title" + j + "'>" + roundOb.roundInfo.columnTitles[j] + "</div>");
-      } else {
-        // we have a regular cell.  Add the value to the cell:
-
-
-
-
-        gridString = gridString.concat("id='aq" + (j - 1) + "'>" + roundOb.roundData[((roundOb.roundInfo.columnTitles.length - 1) * j) + i].value + "</div>");
-      }
-    }
-
-    gridString = gridString.concat("</div>");
-
-    //		alert(gridString);
-
-  }
-
-  $("#finalGrid").empty();
-
-  document.getElementById("finalGrid").innerHTML = gridString;
-
-  //	prompt("finalGrid:", gridString);
-
-
-
-  // now place the category (column title) into the top cell:
-
-  //	foreach()
-
-}
+let gameOb = new GameOb(); // "ET1", "now", "none.", [0,0,255], [0,0,0]
 
 
 function showFile() {
@@ -217,7 +173,6 @@ function showFile() {
 }
 
 
-
 function populateFromLoadedGameOb() {
 
 
@@ -227,6 +182,8 @@ function populateFromLoadedGameOb() {
   document.getElementById("creatorField").value = unescape(gameOb.gameInfo.creator);
   document.getElementById("dateCreatedField").value = unescape(gameOb.gameInfo.dateCreated);
   document.getElementById("commentsField").value = unescape(gameOb.gameInfo.comments);
+  document.getElementById("background-color").value = unescape(gameOb.gameInfo.backgroundColor);
+  document.getElementById("font-color").value = unescape(gameOb.gameInfo.fontColor);
 
   // update the roundID counter to reflect the current game file:
   for (var i = 0; i < gameOb.rounds.length; i++) {
@@ -266,16 +223,6 @@ function populateRoundsFromFile() {
   }
 
 }
-/*
-function indicateChange(ob) {
-  // get the parent id:
-  //	alert(element.value);
-	console.log("changed: " + ob.id);
-  //	if(element.)
-
-  //document.getElementById("saveDataButton").disabled = false;
-}
-*/
 
 
 function button_createRound(theRoundID) {
@@ -286,11 +233,11 @@ function button_createRound(theRoundID) {
 
   // create a new round on the list of rounds:
 
-  if (theRoundID == "[object MouseEvent]") {
+  if (theRoundID == "[object MouseEvent]" || theRoundID == "[object PointerEvent]") {
 
     // the user clicked on the "new round" button:
 
-    roundCounter++;
+    //roundCounter++;
 
     thisRoundID = roundCounter;
 
@@ -308,7 +255,7 @@ function button_createRound(theRoundID) {
     // a file is being loaded.  set the ID to be the roundID from the gameOb:
     thisRoundID = theRoundID
 
-    roundCounter++;
+    //roundCounter++;
 
     // search for the roundName's:
     for (var i = 0; i < gameOb.rounds.length; i++) {
@@ -319,7 +266,7 @@ function button_createRound(theRoundID) {
     }
   }
 
-  var roundNumString = "<li id='" + thisRoundID + "'><span>" + nameOfRound + "</span><button id='reb" + roundCounter + "' onclick='button_editRoundItem(this.id)' type='button'>Edit</button><button type='button' id='rdb" + roundCounter + "' onclick='button_deleteRoundItem(this.id)' type='button'>Delete</button></li>";
+  var roundNumString = "<li id='" + thisRoundID + "'><span class='round-name'>" + nameOfRound + "</span><button id='reb" + roundCounter + "' onclick='button_editRoundItem(this.id)' type='button'>Edit</button><button type='button' id='rdb" + roundCounter + "' onclick='button_deleteRoundItem(this.id)' type='button'>Delete</button></li>";
 
   // add it to the list:
   $(roundNumString).appendTo("#rounds");
@@ -344,6 +291,8 @@ function button_deleteRoundItem(but_id) {
   //	alert("currRound: " + currRound + ", roundID: " + roundID);
 
   // remove the round:
+  
+
 
   // if the round we deleted is the current round we are working on, purge the info fields:
   if (currRound == roundID) {
@@ -385,7 +334,7 @@ function updateRoundName() {
 
 
 function changeNumOfRows() {
-
+  // get the new number of rows as input into the field:
   var newRowsNum = parseInt(document.getElementById("numOfRowsField").value);
 
   //	alert(gameOb.rounds[currRound].roundInfo.numberOfQuestionRows);
@@ -400,9 +349,12 @@ function changeNumOfRows() {
     }
   } else {
     gameOb.rounds[currRound].roundInfo.numberOfQuestionRows = newRowsNum;
+    createJeopardyTable(newRowsNum, gameOb.rounds[currRound].categories.length);
   }
-
+  
   saveAllFields();
+
+  
 
 }
 
@@ -416,6 +368,7 @@ function enableEditRound(canEdit) {
     document.getElementById("finalAnswerField").disabled = false;
     document.getElementById("finalQuestionField").disabled = false;
     document.getElementById("finalSourceField").disabled = false;
+    document.getElementById("finalCommentsField").disabled = false;
   } else {
     document.getElementById("roundNameField").disabled = true;
     document.getElementById("numOfRowsField").disabled = true;
@@ -424,6 +377,7 @@ function enableEditRound(canEdit) {
     document.getElementById("finalAnswerField").disabled = true;
     document.getElementById("finalQuestionField").disabled = true;
     document.getElementById("finalSourceField").disabled = true;
+    document.getElementById("finalCommentsField").disabled = true;
   }
 }
 
@@ -445,6 +399,9 @@ function purgeGameInfo() {
   document.getElementById("creatorField").value = null;
   document.getElementById("dateCreatedField").value = null;
   document.getElementById("commentsField").value = null;
+  document.getElementById("background-color").value = "#0000FF";
+  document.getElementById("font-color").value = "#FFFFFF";
+
 
 }
 
@@ -461,6 +418,7 @@ function purgeRoundInfo() {
   document.getElementById("finalAnswerField").value = null;
   document.getElementById("finalQuestionField").value = null;
   document.getElementById("finalSourceField").value = null;
+  document.getElementById("finalCommentsField").value = null;
 
   enableEditRound(false);
 }
@@ -468,7 +426,7 @@ function purgeRoundInfo() {
 
 function button_editRoundItem(theID) {
 
-	console.log("editing round...");
+    console.log("editing round...");
 
   //	alert($("#"+theID).parent().attr('id'));
   //	alert("theID: " + theID);
@@ -501,28 +459,30 @@ function button_editRoundItem(theID) {
   document.getElementById("finalAnswerField").enabled = true;
   document.getElementById("finalQuestionField").enabled = true;
   document.getElementById("finalSourceField").enabled = true;
+  document.getElementById("finalCommentsField").enabled = true;
   document.getElementById("finalAnswerField").value = unescape(roundInfoOb.finalJeopardy.answer);
   document.getElementById("finalQuestionField").value = unescape(roundInfoOb.finalJeopardy.question);
   document.getElementById("finalSourceField").value = unescape(roundInfoOb.finalJeopardy.source);
+  document.getElementById("finalCommentsField").value = unescape(roundInfoOb.finalJeopardy.comments);
 
-  createJeopardyTable(roundInfoOb.numberOfQuestionRows, roundInfoOb.columnTitles.length);
+  createJeopardyTable(roundInfoOb.numberOfQuestionRows, gameOb.rounds[obIndex].categories.length);
 
   //	generateGameBoard(gameOb.rounds[currRound]);
 
 
   $("#colTitlesList").empty();
   
-  console.log("creating column titles..." + roundInfoOb.columnTitles.length + " titles");
+  console.log("creating column titles..." + gameOb.rounds[obIndex].categories.length + " titles");
 
   // load the colTitlesList from the array:
-  for (var i = 0; i < roundInfoOb.columnTitles.length; i++) {
+  for (var i = 0; i < gameOb.rounds[obIndex].categories.length; i++) {
     
     let titleDiv = document.createElement('div');
     titleDiv.id = "round" + obIndex + "cat" + i;
 
     let titleField = document.createElement('input');
     titleField.type = "field";
-    titleField.value = unescape(roundInfoOb.columnTitles[i]);
+    titleField.value = unescape(gameOb.rounds[obIndex].categories[i].title);
     titleField.onfocusout = function(){saveAllFields()};
 
     let titleButton = document.createElement('button');
@@ -540,16 +500,7 @@ function button_editRoundItem(theID) {
     
     document.getElementById("colTitlesList").appendChild(titleDiv);
 
-    //titleField.appendTo(titleDiv);
-    //titleButton.appendTo(titleDiv);
-    //titleDiv.appendTo("#colTitlesList");
 
-
-    //var titleStr = "<div id='round" + obIndex + "cat" + i + "'><input type='field' value='" + unescape(roundInfoOb.columnTitles[i]) + "'/><button id='cdb" + obIndex + "_" + i + "' type='button' onclick='removeCategory(" + obIndex + ", " + i + ", this.id)'>Delete</button></div>";
-
-    //		alert(unescape(roundInfoOb.columnTitles[i]));
-
-    //$(titleStr).appendTo("#colTitlesList");
 
   }
 
@@ -569,78 +520,139 @@ function refreshAll() {
 }
 
 
-function editCellData() {
-  //	alert(this.innerHTML);
-}
-
-
-
 function createJeopardyTable(rows, cols) {
 
-  //	alert("currQA.category: " + typeof currQA.category + ", currQA.pos: " + typeof currQA.pos);
+  console.log("rows: " + rows + ", columns: " + cols);
   // use the rows and columns to fill a div with a grid/table thing:
   rowsNum = parseInt(rows);
   // clear the grid:
-  $("#gameGrid").empty();
+  //$("#gameGrid").empty();
 
-  $("#gen_tab").empty();
+  $("#finalGrid").empty();
 
-  // prebuild the grid:
+  // create a div for each category column container:
+  for(let x = 0; x < cols; x++){
+      let categoryColumn = document.createElement('div');
+      categoryColumn.classList.add("category-container");
 
-  let tableEl = document.getElementById("gen_tab");
+      // add a qa_item div for each qa_item and put it into the column_container:
+      for(let obs = 0; obs < rows+1; obs++){
+          
 
-  let tblBody = document.createElement('tbody');
-  tblBody.id = "1,2";
-  tableEl.appendChild(tblBody);
+          if (obs == 0) {
+              // it's a title row. Make div's:
+              let categoryTitle = document.createElement('div');
+              categoryTitle.classList.add("qa_title");
+              categoryTitle.innerHTML = unescape(gameOb.rounds[currRound].categories[x].title);
+              categoryColumn.appendChild(categoryTitle);
+            } else {
 
-  for (var t = 0; t < rowsNum + 1; t++) {
-    // add a <tr> for each row, to include the title row:
-    let tblRow = document.createElement('tr');
+              // regular cell, make divs's:
+              let obCell = document.createElement('div');
+              obCell.classList.add("qa_item");
+              obCell.id = x + "," + (obs-1);
+              obCell.addEventListener('click', function(){
+                  editQA(obs-1, x, this);
+                  document.getElementById("qaPoints").scrollIntoView();
+              }, false);
 
-    //for each row, add the appropriate amount of cells (equal to the number of columns):
-    for (var c = 0; c < cols; c++) {
-      if (t == 0) {
-        // it's a title row. Make <th>'s:
-        let th = document.createElement('th');
-        th.innerHTML = unescape(gameOb.rounds[currRound].roundInfo.columnTitles[c]);
-        tblRow.appendChild(th);
-      } else {
-        // regular cell, make <td>'s:
-        let td = document.createElement('td');
-        td.id = t + "," + c;
-        td.innerHTML = "x";
-        td.classList.add("qa_item");
-        let cellCall = td.id.split(",");
-        td.addEventListener("click", function() {
-          editQA(cellCall[0], cellCall[1], this);
-          document.getElementById("qaValue").scrollIntoView();
-        }, false);
-        tblRow.appendChild(td);
+
+              if(obs > gameOb.rounds[currRound].categories[x].qaObs.length){
+                  // we don't have enough qa_items to fill the rows.  Create it:
+                  gameOb.rounds[currRound].categories[x].addQAob(obs-1, (obs*100));
+                  obCell.classList.add("default");
+              }
+              else{
+                  // we have enough qa_items.  fill the cell with the qa_item points:
+                  obCell.innerHTML = gameOb.rounds[currRound].categories[x].qaObs[obs-1].points;
+              }  
+
+              categoryColumn.appendChild(obCell);
+
+          }
+
+
       }
-    }
 
-    tblBody.appendChild(tblRow);
+      document.getElementById("finalGrid").appendChild(categoryColumn);
 
-    //	document.getElementById("#gameGrid").appendChild(tblBody);
+      //  if(cols > 0){
+      //    let colWidth = (100/cols).toString() + "%";
+      //    console.log("colWidth: " + colWidth);
+      //    $(".qa_title").css({'width':colWidth});
+      //  }
 
   }
 
-  document.getElementById("finalGrid").appendChild(tableEl);
+  // make columns equal widths:
+
+  
+
+
+  // $("#gen_tab").empty();
+
+
+  // // prebuild the grid:
+
+  // let tableEl = document.getElementById("gen_tab");
+
+  // let tblBody = document.createElement('tbody');
+  // tblBody.id = "1,2";
+  // tableEl.appendChild(tblBody);
+
+  // for (var t = 0; t < rowsNum + 1; t++) {
+  //   // add a <tr> for each row, to include the title row:
+  //   let tblRow = document.createElement('tr');
+
+  //   //for each row, add the appropriate amount of cells (equal to the number of columns):
+  //   for (var c = 0; c < cols; c++) {
+  //     if (t == 0) {
+  //       // it's a title row. Make <th>'s:
+  //       let th = document.createElement('th');
+  //       th.innerHTML = unescape(gameOb.rounds[currRound].categories[c].title);
+  //       tblRow.appendChild(th);
+  //     } else {
+  //       // regular cell, make <td>'s:
+  //       let td = document.createElement('td');
+  //       td.id = t + "," + c;
+  //       if(gameOb.rounds[currRound].categories[c].qaObs[t].points != undefined){
+  //         td.innerHTML = gameOb.rounds[currRound].categories[c].qaObs[t].points;
+  //       }
+  //       else{
+  //         td.innerHTML = "x";
+  //       }
+  //       td.classList.add("qa_item");
+  //       let cellCall = td.id.split(",");
+  //       td.addEventListener("click", function() {
+  //         editQA(cellCall[0], cellCall[1], this);
+  //         document.getElementById("qaPoints").scrollIntoView();
+  //       }, false);
+  //       tblRow.appendChild(td);
+  //     }
+  //   }
+
+  //   tblBody.appendChild(tblRow);
+
+  //   //	document.getElementById("#gameGrid").appendChild(tblBody);
+
+  // }
+
+  // document.getElementById("finalGrid").appendChild(tableEl);
 
   // now iterate through the roundData elements and place them into their proper places:
 
-  for (var e = 0; e < gameOb.rounds[currRound].roundData.length; e++) {
-    // look at the category and position of each
-    let thisQA = gameOb.rounds[currRound].roundData[e];
+  // for (var e = 0; e < gameOb.rounds[currRound].roundData.length; e++) {
+  //   // look at the category and position of each
+  //   let thisQA = gameOb.rounds[currRound].roundData[e];
 
-    // the row is the .pos+1, the column is the category:
-    let cell = tblBody.children[thisQA.pos].children[thisQA.category];
+  //   // the row is the .pos+1, the column is the category:
+  //   let cell = tblBody.children[thisQA.pos].children[thisQA.category];
 
-    // add the cell value:
-    cell.innerHTML = thisQA.value;
+  //   // add the cell points:
+  //   cell.innerHTML = thisQA.points;
 
 
-  }
+  // }
 
 
 }
@@ -662,16 +674,16 @@ function exportText() {
 
     // for each round:
 
-    for (var i = 0; i < gameOb.rounds.length; i++) {
+  //   for (var i = 0; i < gameOb.rounds.length; i++) {
 
-      // look into the roundData array and sort by category then by position
+  //     // look into the roundData array and sort by category then by position
 
-      // sort the array by pos:
-      gameOb.rounds[i].roundData.sort(function(a, b) {
-        return a.pos - b.pos
-      });
+  //     // sort the array by pos:
+  //     gameOb.rounds[i].roundData.sort(function(a, b) {
+  //       return a.pos - b.pos
+  //     });
 
-    }
+  //   }
 
     //	alert(gameOb.rounds[i].roundData);
 
@@ -691,7 +703,7 @@ function createCategory() {
 
   //	alert("currRound: " + currRound);
 
-  var catPos = gameOb.rounds[currRound].roundInfo.columnTitles.length;
+  var catPos = gameOb.rounds[currRound].categories.length;
   
   // create a new category field & button:
   var newCat = document.createElement("div");
@@ -728,7 +740,7 @@ function createCategory() {
   //var titleStr = "<div class='categoryField' id='round" + currRound + "cat" + catPos + "'><input type='field' value='Example Category'/><button id='ceb" + currRound + "_" + catPos + "' type='button' onclick='removeCategory(" + currRound + ", " + catPos + ", this.id)'>Delete</button></div>";
 
   // now add it to the actual array:
-  gameOb.rounds[currRound].roundInfo.columnTitles.push("Example Category");
+  gameOb.rounds[currRound].addCategory();
 
   // add the category item into the list:
   //$(titleStr).appendTo("#colTitlesList");
@@ -736,13 +748,13 @@ function createCategory() {
   document.getElementById("colTitlesList").appendChild(newCat);
   
   newInputField.select();
-  
-  
 
+  // flexbox, depending on the number of categories, make each column take up an equal width:
+  
   refreshAll();
 
   // rebuild the game grid:
-  createJeopardyTable(gameOb.rounds[currRound].roundInfo.numberOfQuestionRows, gameOb.rounds[currRound].roundInfo.columnTitles.length);
+  createJeopardyTable(gameOb.rounds[currRound].roundInfo.numberOfQuestionRows, gameOb.rounds[currRound].categories.length);
 
   //	generateGameBoard(gameOb.rounds[currRound]);
 
@@ -757,21 +769,19 @@ function editQA(_pos, _col, element) {
   $("#category_data").accordion("option", "active", 0);
 
 
-  let theRound = gameOb.rounds[currRound];
+  let theRound = gameOb.rounds[currRound].categories[_col];
 
   // load the appropriate data:
 
-  let thisQA = theRound.roundData.find(function(qa) {
-    return qa.pos == _pos && qa.category == _col;
-  });
+  let thisQA = gameOb.rounds[currRound].categories[_col].qaObs[_pos];
 
 
   if (!thisQA) {
     //	alert("no data exists");
     // the QAob is not created.  Create one and load it, using the row and col:
-    theRound.roundData.push(new QAob(true, _col, _pos, (100 * _pos), "answer", "question", "source", false));
+    theRound.categories.addQAob(_pos, (100 * _pos));
 
-    thisQA = theRound.roundData[theRound.roundData.length - 1];
+    thisQA = theRound.qaObs[qaObs.length - 1];
 
 
   }
@@ -785,10 +795,12 @@ function editQA(_pos, _col, element) {
 
   // we either loaded a QAob or created one.  Now load the variables into the fields:
 
-  document.getElementById("qaValue").value = thisQA.value;
+  document.getElementById("qaPoints").value = thisQA.points;
+  document.getElementById("qaTimerInSeconds").value = thisQA.timerInSeconds;
   document.getElementById("qaAnswer").value = unescape(thisQA.answer);
   document.getElementById("qaQuestion").value = unescape(thisQA.question);
   document.getElementById("qaSource").value = unescape(thisQA.source);
+  document.getElementById("qaComments").value = unescape(thisQA.comments);
   document.getElementById("qaDailyDouble").checked = thisQA.isDailyDouble;
 
   // now designate the QA as being selected, removing it from any previous:
@@ -811,9 +823,9 @@ function editQA(_pos, _col, element) {
 function validateNum() {
 
 
-  let valField = document.getElementById("qaValue");
-  // look at the value of the "qaValue" field, and change the color of the field if it is NaN:
-  if (isNaN(valField.value)) {
+  let valField = document.getElementById("qaPoints");
+  // look at the value of the "qaPoints" field, and change the color of the field if it is NaN:
+  if (isNaN(valField.points)) {
     // color the field red:
     valField.classList.add("invalidField");
   } else {
@@ -829,17 +841,19 @@ function saveQAdata() {
 
   if (currQA != null) {
 
-    if ($("#qaValue").hasClass("invalidField") == false) {
+    if ($("#qaPoints").hasClass("invalidField") == false) {
 
-      currQA.value = parseInt(document.getElementById("qaValue").value);
+      currQA.points = parseInt(document.getElementById("qaPoints").value);
+      currQA.timerInSeconds = parseInt(document.getElementById("qaTimerInSeconds").value);
       currQA.answer = escape(document.getElementById("qaAnswer").value);
       currQA.question = escape(document.getElementById("qaQuestion").value);
       currQA.source = escape(document.getElementById("qaSource").value);
+      currQA.comments = escape(document.getElementById("qaComments").value);
       currQA.isDailyDouble = document.getElementById("qaDailyDouble").checked;
 
       // change the currQA to be the value of the QA.  The first item should be the only item:
 
-      $(".selected")[0].innerHTML = currQA.value;
+      $(".selected")[0].innerHTML = currQA.points;
 
     } else {
       alert("error: invalid value");
@@ -856,10 +870,12 @@ function purgeQAdata() {
 
   currQA = null;
 
-  document.getElementById("qaValue").value = null;
+  document.getElementById("qaPoints").value = null;
+  document.getElementById("qaTimerInSeconds").value = null;
   document.getElementById("qaAnswer").value = null;
   document.getElementById("qaQuestion").value = null;
   document.getElementById("qaSource").value = null;
+  document.getElementById("qaComments").value = null;
   document.getElementById("qaDailyDouble").checked = false;
 
 }
@@ -867,7 +883,7 @@ function purgeQAdata() {
 
 function saveAllFields() {
 
-	console.log("saving all fields...");
+    console.log("saving all fields...");
 
   //	alert("roundID: " + gameOb.rounds[currRound].roundID);
 
@@ -878,6 +894,8 @@ function saveAllFields() {
   gameOb.gameInfo.creator = escape(document.getElementById("creatorField").value);
   gameOb.gameInfo.dateCreated = escape(document.getElementById("dateCreatedField").value);
   gameOb.gameInfo.comments = escape(document.getElementById("commentsField").value);
+  gameOb.gameInfo.backgroundColor = escape(document.getElementById("background-color").value);
+  gameOb.gameInfo.fontColor = escape(document.getElementById("font-color").value);
 
   // information for the current round being edited:
 
@@ -887,25 +905,24 @@ function saveAllFields() {
   gameOb.rounds[currRound].roundInfo.finalJeopardy.answer = escape(document.getElementById("finalAnswerField").value);
   gameOb.rounds[currRound].roundInfo.finalJeopardy.question = escape(document.getElementById("finalQuestionField").value);
   gameOb.rounds[currRound].roundInfo.finalJeopardy.source = escape(document.getElementById("finalSourceField").value);
+  gameOb.rounds[currRound].roundInfo.finalJeopardy.comments = escape(document.getElementById("finalCommentsField").value);
 
   // save the categories:
 
   //		alert(currRound);
-
-  var catArray = [];
   
-  console.log("columnTitles.length: " + gameOb.rounds[currRound].roundInfo.columnTitles.length);
+  console.log("number of categories: " + gameOb.rounds[currRound].categories.length);
 
-  for (var i = 0; i < gameOb.rounds[currRound].roundInfo.columnTitles.length; i++) {
-    console.log("columnTitle : " + gameOb.rounds[currRound].roundInfo.columnTitles[i]);
+  for (var i = 0; i < gameOb.rounds[currRound].categories.length; i++) {
+    console.log("columnTitle : " + gameOb.rounds[currRound].categories[i].title);
     //take each item from the list, use the field inside to create an array to update the column titles array in the gameOb:
-    catArray.push(escape(document.getElementById("colTitlesList").children[i].children[0].value));
+    gameOb.rounds[currRound].categories[i].title = document.getElementById("colTitlesList").children[i].children[0].value;
     //			alert(catArray[i]);
   }
 
-  gameOb.rounds[currRound].roundInfo.columnTitles = catArray;
+  //gameOb.rounds[currRound].roundInfo.columnTitles = catArray;
 
-  createJeopardyTable(gameOb.rounds[currRound].roundInfo.numberOfQuestionRows, gameOb.rounds[currRound].roundInfo.columnTitles.length);
+  createJeopardyTable(gameOb.rounds[currRound].roundInfo.numberOfQuestionRows, gameOb.rounds[currRound].categories.length);
 
   //		generateGameBoard(gameOb.rounds[currRound]);
 
@@ -918,62 +935,19 @@ function saveAllFields() {
 function removeCategory(rnd, pos, but_id) {
 
   // remove the sortable item:
-  if (confirm("are you sure you want to delete this category and all associated data?")) {
 
     //			alert(but_id);
     // this object is actually the button, and the round is its parent, so remove the parent:
     $("#" + but_id).parent().remove();
 
-    // remove the title:
-    gameOb.rounds[rnd].roundInfo.columnTitles.splice(pos, 1);
-
-    // remove the associated question-answers:
-
+    // remove the category:
+    gameOb.rounds[rnd].categories.splice(pos, 1);
 
     // refresh the sortable list:
     refreshAll();
 
   }
 
-  // remove the corresponding array item:
-
-
-}
-
-
-function selectIfDefault(ob){
-
-	console.log("selectDefault: " + ob.id);
-
-	switch(ob.id){
-  
-  	case "qaAnswer":
-    	if(qaAnswerField.value == "answer"){
-      	qaAnswerField.select();
-      }
-    break;
-    
-    case "qaQuestion":
-    	if(qaQuestionField.value == "question"){
-      	qaQuestionField.select();
-      }
-    
-    break;
-    
-    case "qaSource":
-    	if(qaSourceField.value == "source"){
-      	qaSourceField.select();
-      }
-    
-    break;
-    
-    default:
-    	console.log("unidentified input while selecting round QAS");
-    break;
-  
-  }
-
-}
 
 
 function button_createNew() {
@@ -991,12 +965,6 @@ function button_createNew() {
     populateRoundsFromFile();
 
   }
-
-
-  //	alert("attempting to create a new file...");
-
-  // use a template to create a templated gameOb:
-
 
 }
 
