@@ -8,6 +8,13 @@ $(document).ready(function() {
   document.getElementById('file').addEventListener('change', showFile, false);
 
   // listen for buttons:
+  
+  
+	$("#openIWindow").on('click', function(){
+		
+		openInstructorWindow();
+		
+	});
 
   // listen for field changes:
 
@@ -31,9 +38,25 @@ $(document).ready(function() {
 });
 
 
-var roundCounter = 1000;
+let state = { "file_states":["game_not_loaded", 
+                             "game_loaded"],
+             "game_states":["game_not_begun", 
+                            "game_begun", 
+                            "game_ended"],
+             "displayStates":["blank", 
+                              "main_board", 
+                              "show_question", 
+                              "give_answer_source", 
+                              "show_daily_double", 
+                              "final_jeopardy", 
+                              "final_jeopardy_question", 
+                              "final_jeopardy_answer"],
+             
+             "current_file_state":"game_not_loaded",
+             "current_game_state":"game_not_begun",
+             "current_game_state":"blank"
+            }
 
-var currRound = -1;
 
 let currQA = {};
 
@@ -149,6 +172,48 @@ function showFile() {
   }
   reader.readAsText(file);
 }
+
+function openInstructorWindow(){
+	
+    myWindow = window.open("", "myWindow", "width=800,height=800");
+    myWindow.document.write("<p>Move this window onto the extra screen area.</p>");
+    myWindow.document.title = "Instructor Window";
+    var qDiv = document.createElement('div');
+    var aDiv = document.createElement('div');
+    qDiv.style.margin = "20px";
+    aDiv.style.margin = "20px";
+    qDiv.style.padding = "20px";
+    aDiv.style.padding = "20px";
+    qDiv.style.textAlign = "center";
+    aDiv.style.textAlign = "center";
+    aDiv.style.fontSize = "60px";
+    qDiv.style.fontSize = "60px";
+    qDiv.innerHTML = "Example question";
+    aDiv.innerHTML = "example answer";
+    aDiv.style.backgroundColor = "red";
+    qDiv.style.backgroundColor = "blue";
+    aDiv.style.color = "white";
+    qDiv.style.color = "white";
+    myWindow.document.body.style.color = "white";
+    myWindow.document.body.style.backgroundColor = "black";
+    aDiv.id = "answer";
+    qDiv.id = "question";
+    myWindow.document.body.appendChild(aDiv);
+    myWindow.document.body.appendChild(qDiv);
+  
+	
+}
+
+
+function updateInstructorWindow(str1, str2){
+	
+    // update the instructor window with proper information:
+    myWindow.document.getElementById("answer").innerHTML = str1;
+    myWindow.document.getElementById("question").innerHTML = str2;
+	
+}
+
+
 
 
 function populateFromLoadedGameOb() {
