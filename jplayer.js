@@ -176,6 +176,12 @@ function showFile() {
 function openInstructorWindow(){
 	
     myWindow = window.open("", "myWindow", "width=800,height=800");
+    let head = Document.getElementByTagName('HEAD')[0];
+    let link = Document.creatElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = 'instructor-window.css';
+	
     myWindow.document.write("<p>Move this window onto the extra screen area.</p>");
     myWindow.document.title = "Instructor Window";
     var qDiv = document.createElement('div');
