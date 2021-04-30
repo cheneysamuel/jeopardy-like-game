@@ -10,8 +10,6 @@ $(document).ready(function() {
   // listen for buttons:
 
   // listen for field changes:
-  document.getElementById('numOfRowsField').addEventListener('change', changeNumOfRows, false);
-  document.getElementById('roundNameField').addEventListener('change', updateRoundName, false);
 
   document.getElementById('qaPoints').addEventListener('change', validateNum, false);
   document.getElementById('qaTimerInSeconds').addEventListener('change', validateNum, false);
