@@ -174,7 +174,8 @@ function showFile() {
 }
 
 function openInstructorWindow(){
-	
+
+    // create the window and load the appropriate css file:
     myWindow = window.open("", "myWindow", "width=800,height=800");
     let head = Document.getElementByTagName('HEAD')[0];
     let link = Document.creatElement('link');
@@ -183,27 +184,40 @@ function openInstructorWindow(){
     link.href = 'instructor-window.css';
     head.appendChild(link);
     
+    // create the instructor window elements:
     myWindow.document.write("<p>Move this window onto the extra screen area.</p>");
     myWindow.document.title = "Instructor Window";
-    var qDiv = document.createElement('div');
-    var aDiv = document.createElement('div');
+    var questionDiv = document.createElement('div');
+    var answerDiv = document.createElement('div');
+    var sourceDiv = document.createElement('div');
+    var commentsDiv = document.createElement('div');
 
-    myWindow.document.body.style.color = "white";
-    myWindow.document.body.style.backgroundColor = "black";
-    aDiv.id = "answer";
-    qDiv.id = "question";
-    myWindow.document.body.appendChild(aDiv);
-    myWindow.document.body.appendChild(qDiv);
+    questionDiv.innerHTML = "example question";
+    answerDiv.innerHTML = "example answer";
+    sourceDiv.innerHTML = "example source";
+    commentsDiv.innerHTML = "example comments";
+	
+    answerDiv.id = "answer-div";
+    questionDiv.id = "question-div";
+    sourceDiv.id = "source-div";
+    commentsDiv.id = "comments-div";
+	
+    myWindow.document.body.appendChild(answerDiv);
+    myWindow.document.body.appendChild(questionDiv);
+    myWindow.document.body.appendChild(sourceDiv);
+    myWindow.document.body.appendChild(commentsDiv);
   
 	
 }
 
 
-function updateInstructorWindow(str1, str2){
+function updateInstructorWindow(str1, str2, str3, str4){
 	
     // update the instructor window with proper information:
-    myWindow.document.getElementById("answer").innerHTML = str1;
-    myWindow.document.getElementById("question").innerHTML = str2;
+    myWindow.document.getElementById("answer-div").innerHTML = str1;
+    myWindow.document.getElementById("question-div").innerHTML = str2;
+    myWindow.document.getElementById("source-div").innerHTML = str3;
+    myWindow.document.getElementById("comments-div").innerHTML = str4;
 	
 }
 
