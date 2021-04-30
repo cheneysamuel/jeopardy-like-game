@@ -181,25 +181,13 @@ function openInstructorWindow(){
     link.rel = 'stylesheet';
     link.type = 'text/css';
     link.href = 'instructor-window.css';
-	
+    head.appendChild(link);
+    
     myWindow.document.write("<p>Move this window onto the extra screen area.</p>");
     myWindow.document.title = "Instructor Window";
     var qDiv = document.createElement('div');
     var aDiv = document.createElement('div');
-    qDiv.style.margin = "20px";
-    aDiv.style.margin = "20px";
-    qDiv.style.padding = "20px";
-    aDiv.style.padding = "20px";
-    qDiv.style.textAlign = "center";
-    aDiv.style.textAlign = "center";
-    aDiv.style.fontSize = "60px";
-    qDiv.style.fontSize = "60px";
-    qDiv.innerHTML = "Example question";
-    aDiv.innerHTML = "example answer";
-    aDiv.style.backgroundColor = "red";
-    qDiv.style.backgroundColor = "blue";
-    aDiv.style.color = "white";
-    qDiv.style.color = "white";
+
     myWindow.document.body.style.color = "white";
     myWindow.document.body.style.backgroundColor = "black";
     aDiv.id = "answer";
