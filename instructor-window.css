@@ -1,4 +1,14 @@
-#aDiv {
+body {
+  color: white;
+  background-color: black;
+}
+
+div {
+   border: 4px solid blue; 
+}
+
+
+#answer-div {
   background-color: black;
   color: white;
   margin: 20px;
@@ -7,7 +17,7 @@
   text-align: center;
 }
 
-#qDiv {
+#question-div {
   background-color: black;
   color: white;
   margin: 20px;
