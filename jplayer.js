@@ -176,7 +176,7 @@ function showFile() {
 function openInstructorWindow(){
 
     // create the window and load the appropriate css file:
-    myWindow = window.open("", "myWindow", "width=800,height=800");
+    instructorWindow = window.open("", "instructorWindow", "width=800,height=800");
     let head = Document.getElementByTagName('HEAD')[0];
     let link = Document.creatElement('link');
     link.rel = 'stylesheet';
@@ -185,8 +185,8 @@ function openInstructorWindow(){
     head.appendChild(link);
     
     // create the instructor window elements:
-    myWindow.document.write("<p>Move this window onto the extra screen area.</p>");
-    myWindow.document.title = "Instructor Window";
+    instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
+    instructorWindow.document.title = "Instructor Window";
     var questionDiv = document.createElement('div');
     var answerDiv = document.createElement('div');
     var sourceDiv = document.createElement('div');
@@ -202,10 +202,10 @@ function openInstructorWindow(){
     sourceDiv.id = "source-div";
     commentsDiv.id = "comments-div";
 	
-    myWindow.document.body.appendChild(answerDiv);
-    myWindow.document.body.appendChild(questionDiv);
-    myWindow.document.body.appendChild(sourceDiv);
-    myWindow.document.body.appendChild(commentsDiv);
+    instructorWindow.document.body.appendChild(answerDiv);
+    instructorWindow.document.body.appendChild(questionDiv);
+    instructorWindow.document.body.appendChild(sourceDiv);
+    instructorWindow.document.body.appendChild(commentsDiv);
   
 	
 }
@@ -214,10 +214,10 @@ function openInstructorWindow(){
 function updateInstructorWindow(str1, str2, str3, str4){
 	
     // update the instructor window with proper information:
-    myWindow.document.getElementById("answer-div").innerHTML = str1;
-    myWindow.document.getElementById("question-div").innerHTML = str2;
-    myWindow.document.getElementById("source-div").innerHTML = str3;
-    myWindow.document.getElementById("comments-div").innerHTML = str4;
+    instructorWindow.document.getElementById("answer-div").innerHTML = str1;
+    instructorWindow.document.getElementById("question-div").innerHTML = str2;
+    instructorWindow.document.getElementById("source-div").innerHTML = str3;
+    instructorWindow.document.getElementById("comments-div").innerHTML = str4;
 	
 }
 
