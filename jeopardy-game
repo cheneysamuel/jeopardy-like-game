@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-bootstrap/0.5pre/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="jeopardygame.css">
+    <script type="text/javascript" src="jplayer.js"></script>
+
+
+
+</head>
+<body>
+<div class="title"><h3>Jeopardy Game</h3></div>
+<div class="instructions">
+
+</div>
+
+    <div id="title">
+        <input type="file" id="file" name="file" />
+        <output id="list"></output>
+    </div>
+
+    <div id="game_information">
+      <h3 title="Include your game information here. The more information, the better.">Game Information</h3>
+      <div>
+        <ul>
+          <li>
+            <div>Creator: </div>
+            <div><input id="creatorField" type="field" placeholder="Enter your name here." /></div>
+          </li>
+          <li>
+            <div>Date Created: </div>
+            <div><input id="dateCreatedField" type="field" placeholder="Enter the date this game was created here." /></div>
+          </li>
+          <li>
+            <div>Comments: </div>
+            <div><textarea rows="4" cols="50" id="commentsField" type="field" placeholder="Enter any comments here."></textarea></div>
+          </li>
+          <li>
+            <div>Background Color: </div>
+            <div><input data-jscolor="{}" value="#0000FF" id="background-color"></div>
+          </li>
+          <li>
+            <div>Text Color: </div>
+            <div><input data-jscolor="{}" value="#FFFFFF" id="font-color"></div>
+          </li>
+        </ul>
+      </div>
+      <h3 title="Use this to create and edit rounds to your jeopardy game.">Rounds</h3>
+      <div id="roundsSort">
+        <ul id="rounds">
+        </ul>
+        <div><button type="button" id="createRound">New Round</button></div>
+      </div>
+    </div>
+
+    <div id="round_information">
+      <h3>Round Information</h3>
+      <div>
+        <ul>
+          <li>
+            <div>Round Name: </div>
+            <div><input class='roundInfoInputField' onblur='updateRoundName()' id='roundNameField' onchange='saveAllFields()' type="field" placeholder="Name of round." /></div>
+          </li>
+          <li>
+            <div>Number of Rows: </div>
+            <div><input class='roundInfoInputField' id='numOfRowsField' type="field" placeholder="number of rows." /></div>
+          </li>
+          <li>
+            <div>Category Titles: </div>
+            <div id='titleSort'>
+              <div id='colTitlesList' class='horizfloat'></div>
+            </div>
+            <div><button class='roundInfoInputField' type="button" id="createCategory" onclick='createCategory()'>New Category</button></div>
+          </li>
+          <li>
+            <div>Final Jeopardy Included: </div>
+            <div><input class='roundInfoInputField' id='finalJeopardyIncludedCheckbox' onchange='saveAllFields()' type="checkbox" /></div>
+          </li>
+          <li>
+            <div>Final Jeopardy Answer: </div>
+            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalAnswerField' onchange='saveAllFields()' placeholder='final answer at end of round'></textarea></div>
+          </li>
+          <li>
+            <div>Final Jeopardy Question: </div>
+            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalQuestionField' onchange='saveAllFields()' placeholder='final question at end of round'></textarea></div>
+          </li>
+          <li>
+            <div>Final Jeopardy Source: </div>
+            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalSourceField' onchange='saveAllFields()' placeholder='final source at end of round'></textarea></div>
+          </li>
+          <li>
+            <div>Final Jeopardy Comments: </div>
+            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalCommentsField' onchange='saveAllFields()' placeholder='comments on final question/answer'></textarea></div>
+          </li>
+        </ul>
+        <ul>
+          <div id='finalGrid'>
+            <table id="gen_tab"></table>
+          </div>
+        </ul>
+      </div>
+    </div>
+
+    <div id="category_data">
+      <h3>Data</h3>
+      <div>
+        <ul>
+          <li>
+            <div>Points: </div>
+            <div><input class='QAInputField' id='qaPoints' onchange='saveQAdata()' type="field" /></div>
+          </li>
+                    <li>
+            <div>Timer (in seconds): </div>
+            <div><input class='QAInputField' id='qaTimerInSeconds' onchange='saveQAdata()' type="field" value="30"/></div>
+          </li>
+          <li>
+            <div>Answer: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaAnswer' onchange='saveQAdata()' type="field" placeholder="Type answer here."></textarea></div>
+          </li>
+          <li>
+            <div>Question: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaQuestion' onchange='saveQAdata()' type="field" placeholder="type question here."></textarea></div>
+          </li>
+          <li>
+            <div>Source: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaSource' onchange='saveQAdata()' type="field" placeholder="Where was the answer found? What source?."></textarea></div>
+          </li>
+                    <li>
+            <div>Comments: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaComments' onchange='saveQAdata()' type="field" placeholder="type question/answer helps, hints, comments, etc."></textarea></div>
+          </li>
+          <li>
+            <div>Daily Double: </div>
+            <div><input class='QAInputField' id='qaDailyDouble' onchange='saveQAdata()' type="checkbox" /></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+</body>
+</html>
