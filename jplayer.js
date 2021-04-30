@@ -60,7 +60,7 @@ let state = { "file_states":["game_not_loaded",
 
 let currQA = {};
 
-
+let instructorWindow = {};
 
 function GameOb() {
   this.gameInfo = new GameInfoOb();
@@ -176,37 +176,55 @@ function showFile() {
 function openInstructorWindow(){
 
     // create the window and load the appropriate css file:
-    instructorWindow = window.open("", "instructorWindow", "width=800,height=800");
-    let head = Document.getElementByTagName('HEAD')[0];
-    let link = Document.creatElement('link');
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.href = 'instructor-window.css';
-    head.appendChild(link);
+    instructorWindow = window.open("", "Instructor Window", "width=800,height=800");
+//     let head = Document.getElementByTagName('HEAD')[0];
+//     let link = Document.creatElement('link');
+//     link.rel = 'stylesheet';
+//     link.type = 'text/css';
+//     link.href = 'instructor-window.css';
+//     head.appendChild(link);
     
     // create the instructor window elements:
-    instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
-    instructorWindow.document.title = "Instructor Window";
-    var questionDiv = document.createElement('div');
-    var answerDiv = document.createElement('div');
-    var sourceDiv = document.createElement('div');
-    var commentsDiv = document.createElement('div');
+//     instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
+//     instructorWindow.document.title = "Instructor Window";
+	
+    let creatorDiv = instructorWindow.document.getElementById('creator-div');
+    let dateCreatedDiv = instructorWindow.document.getElementById('date-created-div');
+    let gameCommentsDiv = instructorWindow.document.getElementById('game-comments-div');
+	
+    let questionDiv = instructorWindow.document.getElementById('question-div');
+    let answerDiv = instructorWindow.document.getElementById('answer-div');
+    let sourceDiv = instructorWindow.document.getElementById('source-div');
+    let commentsDiv = instructorWindow.document.getElementById('comments-div');
 
+    creatorDiv.innerHTML = "example creator";
+    dateCreatedDiv.innerHTML = "example date created";
+    gameCommentsDiv.innerHTML = "example game comments";   
+	
     questionDiv.innerHTML = "example question";
     answerDiv.innerHTML = "example answer";
     sourceDiv.innerHTML = "example source";
     commentsDiv.innerHTML = "example comments";
 	
-    answerDiv.id = "answer-div";
-    questionDiv.id = "question-div";
-    sourceDiv.id = "source-div";
-    commentsDiv.id = "comments-div";
+//     answerDiv.id = "answer-div";
+//     questionDiv.id = "question-div";
+//     sourceDiv.id = "source-div";
+//     commentsDiv.id = "comments-div";
 	
-    instructorWindow.document.body.appendChild(answerDiv);
-    instructorWindow.document.body.appendChild(questionDiv);
-    instructorWindow.document.body.appendChild(sourceDiv);
-    instructorWindow.document.body.appendChild(commentsDiv);
+//     instructorWindow.document.body.appendChild(answerDiv);
+//     instructorWindow.document.body.appendChild(questionDiv);
+//     instructorWindow.document.body.appendChild(sourceDiv);
+//     instructorWindow.document.body.appendChild(commentsDiv);
   
+	
+}
+
+
+function initializeInstructorWindowWithGameInformation(str1, str2, str3){
+	
+    instructorWindow.document.getElementById("creator-div").innerHTML = str1;
+    instructorWindow.document.getElementById("date-created-div").innerHTML = str2;
+    instructorWindow.document.getElementById("game-comments-div").innerHTML = str3;
 	
 }
 
