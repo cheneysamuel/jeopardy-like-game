@@ -482,7 +482,7 @@ function createJeopardyTable(roundNum) {
 
     document.getElementById("finalGrid").appendChild(gameTable);
 
-    let font_size = ((document.body.offsetHeight / rows) * 0.5) + "px";
+    let font_size = (document.body.offsetHeight / rows) * 0.5;
 
     changeQAfontSize(font_size);
   }
@@ -552,10 +552,20 @@ function changeQAfontSize(size){
 
       // get the array of QA elements:
       let qaArray = Array.from(document.getElementsByClassName("qa_item"));
+      let titleArray = Array.from(document.getElementsByClassName("qa_title"));
 
+      console.log("titleArray: " + titleArray);
+
+      let cellHeight = (document.body.offsetHeight/(gameOb.rounds[currentRound].categories[currentCategory].qaObs.length+2)) - document.getElementsByClassName("qa_title")[0].style.height;
+      console.log("cellHeight: " + cellHeight);
       qaArray.forEach(function(qa){
         // iterate and change size:
-        qa.style.fontSize = size;
+        qa.style.fontSize = size + "px";
+        qa.style.height = cellHeight + "px";
+      });
+
+      titleArray.forEach(function(title){
+        title.style.fontSize = (size/2) + "px";
       });
 
 }
