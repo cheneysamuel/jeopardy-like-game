@@ -152,8 +152,6 @@ function showFile() {
 
       gameOb = new GameOb();
 
-      alert("here");
-
       Object.assign(gameOb, JSON.parse(event.target.result));
 
       // load the round data:
@@ -169,6 +167,7 @@ function showFile() {
 
 function openInstructorWindow(){
 
+    console.log(instructorWindow);
     // create the window and load the appropriate css file:
     if(!instructorWindow || instructorWindow.closed){
       // the window was never opened. open it and load the appropriate game and round information:
@@ -357,36 +356,39 @@ function updateInstructorWindow_roundInfo(str1, str2, str3, str4){
 
 function updateInstructorWindow_QA(round, category, row){
 
-  alert("round: " + round + ", category: " + category + ", row: " + row);
+  console.log("Updating instructor window: round: " + round + ", category: " + category + ", row: " + row + ", state: " + state.current_display_state);
 
-  switch(state.current_game_state){
-    case "final_jeopardy":
-    case "final_jeopardy_answer":
-    case "final_jeopardy_question_source":
-      let fj = gameOb.rounds[round].roundInfo.finalJeopardy;
+  if(instructorWindow.open){
 
-      instructorWindow.document.getElementById("answer-div").innerHTML = unescape(fj.answer);
-      instructorWindow.document.getElementById("question-div").innerHTML = unescape(fj.question);
-      instructorWindow.document.getElementById("source-div").innerHTML = unescape(fj.source);
-      instructorWindow.document.getElementById("comments-div").innerHTML = unescape(fj.comments);
-    break;
-    case "show_answer":
-    case "give_question_source":
-      let thisQA = gameOb.rounds[round].categories[category].qaObs[row];
+    switch(state.current_display_state){
+      case "final_jeopardy":
+      case "final_jeopardy_answer":
+      case "final_jeopardy_question_source":
+        let fj = gameOb.rounds[round].roundInfo.finalJeopardy;
 
-      instructorWindow.document.getElementById("answer-div").innerHTML = unescape(thisQA.answer);
-      instructorWindow.document.getElementById("question-div").innerHTML = unescape(thisQA.question);
-      instructorWindow.document.getElementById("source-div").innerHTML = unescape(thisQA.source);
-      instructorWindow.document.getElementById("comments-div").innerHTML = unescape(thisQA.comments);
-      instructorWindow.document.getElementById("points-div").innerHTML = thisQA.points;
-      instructorWindow.document.getElementById("timer-div").innerHTML = thisQA.timerInSeconds;
-    break;
+        instructorWindow.document.getElementById("answer-div").innerHTML = unescape(fj.answer);
+        instructorWindow.document.getElementById("question-div").innerHTML = unescape(fj.question);
+        instructorWindow.document.getElementById("source-div").innerHTML = unescape(fj.source);
+        instructorWindow.document.getElementById("comments-div").innerHTML = unescape(fj.comments);
+      break;
+      case "show_answer":
+      case "give_question_source":
+        let thisQA = gameOb.rounds[round].categories[category].qaObs[row];
+
+        instructorWindow.document.getElementById("answer-div").innerHTML = unescape(thisQA.answer);
+        instructorWindow.document.getElementById("question-div").innerHTML = unescape(thisQA.question);
+        instructorWindow.document.getElementById("source-div").innerHTML = unescape(thisQA.source);
+        instructorWindow.document.getElementById("comments-div").innerHTML = unescape(thisQA.comments);
+        instructorWindow.document.getElementById("points-div").innerHTML = thisQA.points;
+        instructorWindow.document.getElementById("timer-div").innerHTML = thisQA.timerInSeconds;
+      break;
+    }
   }
 
-  if(state.current_game_state == "final_jeopardy"){
+    if(state.current_game_state == "final_jeopardy"){
 
 
-  }
+    }
   else{
 
   }
@@ -432,86 +434,181 @@ function createJeopardyTable(roundNum) {
 
   // use the rows and columns to fill a div with a grid/table thing:
 
+
+
   // clear the grid:
   $("#finalGrid").empty();
 
   let cols = gameOb.rounds[roundNum].categories.length;
   let rows = gameOb.rounds[roundNum].categories[0].qaObs.length;
 
-  // create a div for each category column container:
-  for(let x = 0; x < cols; x++){
-      let categoryColumn = document.createElement('div');
-      categoryColumn.classList.add("category-container");
+  // issues with the divs.. change to table:
 
-      // add a qa_item div for each qa_item and put it into the column_container:
-      for(let obs = 0; obs < rows+1; obs++){
+  let gameTable = document.createElement("table");
+  gameTable.id = "game-table";
+  gameTable.style.tableLayout = "fixed";
 
-          if (obs == 0) {
-              // it's a title row. Make div's:
-              let categoryTitle = document.createElement('div');
-              categoryTitle.classList.add("qa_title");
-              categoryTitle.innerHTML = unescape(gameOb.rounds[currentRound].categories[x].title);
-              categoryColumn.appendChild(categoryTitle);
-            } else {
+  for(let tr = 0; tr < rows+1; tr++){
+    let newRow = document.createElement("tr");
+    gameTable.appendChild(newRow);
 
-              // regular cell, make divs's:
-              let obCell = document.createElement('div');
-              obCell.classList.add("qa_item");
-              obCell.classList.add("incomplete");
-              obCell.id = x + "," + (obs-1);
-              obCell.addEventListener('click', function(){
-                  playQA(obs-1, x, this);
-              }, false);
+    for(let tc = 0; tc < cols; tc++){
 
-              // we have enough qa_items.  fill the cell with the qa_item points:
-              obCell.innerHTML = gameOb.rounds[currentRound].categories[x].qaObs[obs-1].points;
-
-              categoryColumn.appendChild(obCell);
-
-          }
-
+      if(tr == 0){
+        // title:
+        let newTitle = document.createElement("th");
+        newTitle.classList.add("qa_title");
+        newTitle.style.width = (100.0/cols) + "%";
+        newTitle.innerHTML = unescape(gameOb.rounds[roundNum].categories[tc].title);
+        newRow.appendChild(newTitle);
       }
+      else{
+        // it's a qa_item:
+        let newItem = document.createElement("td");
+        newItem.classList.add("qa_item");
+        newItem.classList.add("incomplete");
+        newItem.innerHTML = gameOb.rounds[currentRound].categories[tc].qaObs[tr-1].points;
+        newItem.addEventListener('click', function(){
+          console.log("clicked on cell");
+          let currRow = tr-1;
+          console.log(currRow);
+          playQA(currRow, tc, this);
+        }, false);
+        newRow.appendChild(newItem);
+      }
+    }
 
-      document.getElementById("finalGrid").appendChild(categoryColumn);
+    gameTable.appendChild(newRow);
 
+    document.getElementById("finalGrid").appendChild(gameTable);
+
+    let font_size = ((document.body.offsetHeight / rows) * 0.5) + "px";
+
+    changeQAfontSize(font_size);
   }
+
+
+
+  // document.getElementById("finalGrid").style.height = "80vh";
+
+  // let font_size = ((document.body.offsetHeight / rows) * 0.5) + "px";
+
+  // console.log("font_size: " + font_size);
+
+  // // create a div for each category column container:
+  // for(let x = 0; x < cols; x++){
+  //     let categoryColumn = document.createElement('div');
+  //     categoryColumn.classList.add("category-container");
+  //       // set the category container widths:
+  //       categoryColumn.style.width = (100.0/cols) + "%";
+
+  //     // add a qa_item div for each qa_item and put it into the column_container:
+  //     for(let obs = 0; obs < rows+1; obs++){
+
+  //         if (obs == 0) {
+  //             // it's a title row. Make div's:
+  //             let categoryTitle = document.createElement('div');
+  //             categoryTitle.classList.add("qa_title");
+  //             categoryTitle.innerHTML = unescape(gameOb.rounds[currentRound].categories[x].title);
+  //             categoryColumn.appendChild(categoryTitle);
+  //           } else {
+
+  //             // regular cell, make divs's:
+  //             let obCell = document.createElement('div');
+  //             obCell.classList.add("qa_item");
+  //             obCell.classList.add("incomplete");
+  //             obCell.id = x + "," + (obs-1);
+  //             obCell.addEventListener('click', function(){
+  //                 console.log("clicked on cell");
+  //                 let currRow = obs-1;
+  //                 console.log(currRow);
+  //                 playQA(currRow, x, this);
+  //             }, false);
+
+  //             // we have enough qa_items.  fill the cell with the qa_item points:
+  //             obCell.innerHTML = gameOb.rounds[currentRound].categories[x].qaObs[obs-1].points;
+
+  //             categoryColumn.appendChild(obCell);
+
+
+
+  //           //  obCell.style.fontFize = font_size;
+
+  //         }
+
+  //     }
+
+  //     document.getElementById("finalGrid").appendChild(categoryColumn);
+
+  //     changeQAfontSize(font_size);
+
+  // }
+
+}
+
+
+function changeQAfontSize(size){
+      // change font sizes according to the size of the final grid after being populated.
+
+      // get the array of QA elements:
+      let qaArray = Array.from(document.getElementsByClassName("qa_item"));
+
+      qaArray.forEach(function(qa){
+        // iterate and change size:
+        qa.style.fontSize = size;
+      });
 
 }
 
 
 function playQA(row, col, ob){
 
-  // change gamestate:
-  state.current_display_state = "show_answer";
+  console.log("row: " + row + ", column: " + col);
+  // has this cell been played yet?
+  if(ob.classList.contains("finished")){
+    
+    // we've clicked on a used cell.  Ask if user wants to restore it?
+    if(confirm("Restore this question?")){
+      ob.classList.remove("finished");
+      ob.classList.add("incomplete");
+      ob.innerHTML = gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].points;
+    }
+  }
+  else{
 
-  currentCategory = col;
-  currentRow = row;
+      // change gamestate:
+      state.current_display_state = "show_answer";
 
-  let overlayBox = document.getElementById("overlay-box");
+      currentCategory = col;
+      currentRow = row;
 
-  let currentQA = gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow];
+      let overlayBox = document.getElementById("overlay-box");
 
-  // instructor clicked on the QA cell, play it.  
+      let currentQA = gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow];
 
-  // load the question and points onto the overlay:
-  document.getElementById("overlay-points").innerHTML = currentQA.points;
-  document.getElementById("overlay-answer").innerHTML = unescape(currentQA.answer);
-  document.getElementById("overlay-question").innerHTML = unescape(currentQA.question);
-  document.getElementById("overlay-source").innerHTML = unescape(currentQA.source);
+      // instructor clicked on the QA cell, play it.  
 
-  document.getElementById("overlay-points").style.display = "block";
-  document.getElementById("overlay-answer").style.display = "block";
+      // load the question and points onto the overlay:
+      document.getElementById("overlay-points").innerHTML = currentQA.points;
+      document.getElementById("overlay-answer").innerHTML = unescape(currentQA.answer);
+      document.getElementById("overlay-question").innerHTML = unescape(currentQA.question);
+      document.getElementById("overlay-source").innerHTML = unescape(currentQA.source);
 
-  // display the overlay:
-  overlayBox.style.display = "block";
+      document.getElementById("overlay-points").style.display = "flex";
+      document.getElementById("overlay-answer").style.display = "flex";
 
-  // update the instructor window information with QA info:
-  updateInstructorWindow_QA(currentRound, currentCategory, currentRow);
+      // display the overlay:
+      overlayBox.style.display = "flex";
 
-  changeOverlayState();
+      // update the instructor window information with QA info:
+      updateInstructorWindow_QA(currentRound, currentCategory, currentRow);
 
-  ob.classList.remove("incomplete");
-  ob.classList.add("selected");
+      changeOverlayState();
+
+      ob.classList.remove("incomplete");
+      ob.classList.add("selected");
+
+  }
 
 }
 
@@ -534,8 +631,10 @@ function clickOverlay(ob){
       // clicking out of question/source, check for end of round & final Jeopardy:
 
       // manage classes for keeping track of cells:
-      ob.classList.remove("selected");
-      ob.classList.add("finished");
+      let currentQA = document.getElementsByClassName("selected")[0];
+
+      currentQA.classList.remove("selected");
+      currentQA.classList.add("finished");
 
       // remove and reset the overlay:
       document.getElementById("overlay-box").style.display = "none";
@@ -543,7 +642,7 @@ function clickOverlay(ob){
       changeOverlayState();
 
       // remove the points text from the overlay box:
-      ob.innerHTML = "";
+      currentQA.innerHTML = "";
 
       checkForRoundCompletion();
 
@@ -597,7 +696,7 @@ function checkForRoundCompletion(){
 
       // no final jeopardy.  check for a next round:
       if(currentRound < gameOb.rounds.length-1){
-  
+        alert("You have finished this round.  Click OK to go to next round");
         // we have another round. Load it:
         currentRound++;
         createJeopardyTable(currentRound);
@@ -636,8 +735,10 @@ function displayFinalJeopardyAnnouncement(){
 
 
 function changeOverlayState(){
+
   switch(state.current_display_state){
     case "show_answer":
+      console.log("hide question & source.");
       document.getElementById("overlay-points").style.display = "block";
       document.getElementById("overlay-answer").style.display = "block";
       document.getElementById("overlay-question").style.display = "none";
@@ -645,12 +746,14 @@ function changeOverlayState(){
       break;
     
     case "give_question_source":
+      console.log("hide points & answer");
       document.getElementById("overlay-points").style.display = "none";
       document.getElementById("overlay-answer").style.display = "none";
       document.getElementById("overlay-question").style.display = "block";
       document.getElementById("overlay-source").style.display = "block";
       break;
     case "final_jeopardy_answer":
+      console.log(state.current_display_state);
       document.getElementById("overlay-points").style.display = "none";
       document.getElementById("overlay-answer").style.display = "block";
       document.getElementById("overlay-question").style.display = "none";
@@ -658,6 +761,7 @@ function changeOverlayState(){
       break;
     
     case "final_jeopardy_question_source":
+      console.log(state.current_display_state);
       document.getElementById("overlay-points").style.display = "none";
       document.getElementById("overlay-answer").style.display = "none";
       document.getElementById("overlay-question").style.display = "block";
@@ -674,9 +778,6 @@ function changeOverlayState(){
   document.getElementById("overlay-answer").innerHTML = unescape(currentQA.answer);
   document.getElementById("overlay-question").innerHTML = unescape(currentQA.question);
   document.getElementById("overlay-source").innerHTML = unescape(currentQA.source);
-
-  document.getElementById("overlay-points").style.display = "block";
-  document.getElementById("overlay-answer").style.display = "block";
 
 }
 
