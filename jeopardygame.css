@@ -81,10 +81,12 @@ td.qa_item {
 }
 
 .overlay-item {
-    font-size: 60px;
+    font-size: 3rem;
     margin: 20px;
     padding: 30px;
     border: solid lightblue 4px;
     border-radius: 30px;
+    line-height: 1;
+    text-align: center;
 }
 
