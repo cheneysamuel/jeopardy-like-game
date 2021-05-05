@@ -60,78 +60,106 @@ let currentRow = 0;
 
 var instructorWindow;
 
-function GameOb() {
-  this.gameInfo = new GameInfoOb();
-  this.rounds = [];
+class LogOb {
+  constructor() {
+    this.logArray = [];
 
-  this.addRound = function() {
-    this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
-    roundCounter++;
+    this.addEntry = function (logStr) {
+      let dtg = new Date();
+      let dtgString = dtg.getHours() + ":" + dtg.getMinutes() + ":" + dtg.getSeconds();
+      this.logArray.push({ "logStr": logStr, "dtg": dtgString });
+    };
+  }
+}
+
+class GameOb {
+  constructor() {
+    this.gameInfo = new GameInfoOb();
+    this.rounds = [];
+
+    this.addRound = function () {
+      this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
+      roundCounter++;
+    };
   }
 }
 
 
-function GameInfoOb() {
-  this.creator = "creator";
-  this.dateCreated = "date created";
-  this.comments = "comments.";
-  this.backgroundColor = "#0000FF";
-  this.fontColor = "#FFFFFF";
+class GameInfoOb {
+  constructor() {
+    this.creator = "creator";
+    this.dateCreated = "date created";
+    this.comments = "comments.";
+    this.backgroundColor = "#0000FF";
+    this.fontColor = "#FFFFFF";
+  }
 }
 
 
-function roundOb(id, info, data) {
-  this.roundID = id;
-  this.roundInfo = info;
-  this.categories = [];
+class roundOb {
+  constructor(id, info, data) {
+    this.roundID = id;
+    this.roundInfo = info;
+    this.categories = [];
 
-   this.addCategory = function() {
-     this.categories.push(new categoryOb("New Category"));
-   }
+    this.addCategory = function () {
+      this.categories.push(new categoryOb("New Category"));
+    };
+  }
 }
 
 
-function roundInfoOb(_roundName, _numOfQuestionRows) {
-  this.roundName = _roundName;
-  this.numberOfQuestionRows = _numOfQuestionRows;
-  this.finalJeopardyIncluded = false;
-  this.finalJeopardy = new finalJ("", "", "", "");
+class roundInfoOb {
+  constructor(_roundName, _numOfQuestionRows) {
+    this.roundName = _roundName;
+    this.numberOfQuestionRows = _numOfQuestionRows;
+    this.finalJeopardyIncluded = false;
+    this.finalJeopardy = new finalJ("", "", "", "");
+  }
 }
 
 
-function categoryOb(_title){
+class categoryOb {
+  constructor(_title) {
     this.title = _title;
     this.qaObs = [];
-    this.addQAob = function(pos, val){
-        this.qaObs.push(new QAob(true, pos, val, 30, "", "", "", "", false));
-    }
+    this.addQAob = function (pos, val) {
+      this.qaObs.push(new QAob(true, pos, val, 30, "", "", "", "", false));
+    };
+  }
 }
 
 
-function QAob(_selectable, _pos, _points, _timerInSeconds, _answer, _question, _source, _comments, _isDailyDouble) {
-  this.selectable = _selectable;
-  this.pos = _pos;
-  this.points = _points;
-  this.timerInSeconds = _timerInSeconds;
-  this.answer = _answer;
-  this.question = _question;
-  this.source = _source;
-  this.comments = _comments;
-  this.isDailyDouble = _isDailyDouble;
+class QAob {
+  constructor(_selectable, _pos, _points, _timerInSeconds, _answer, _question, _source, _comments, _isDailyDouble) {
+    this.selectable = _selectable;
+    this.pos = _pos;
+    this.points = _points;
+    this.timerInSeconds = _timerInSeconds;
+    this.answer = _answer;
+    this.question = _question;
+    this.source = _source;
+    this.comments = _comments;
+    this.isDailyDouble = _isDailyDouble;
+  }
 }
 
 
-function finalJ(_answer, _question, _source, _comments) {
-  this.answer = _answer;
-  this.question = _question;
-  this.source = _source;
-  this.comments = _comments;
+class finalJ {
+  constructor(_answer, _question, _source, _comments) {
+    this.answer = _answer;
+    this.question = _question;
+    this.source = _source;
+    this.comments = _comments;
+  }
 }
 
 
 
 let gameOb = new GameOb(); // "ET1", "now", "none.", [0,0,255], [0,0,0]
 let currentRound = 0;
+
+let gameLog = new LogOb();
 
 
 function showFile() {
@@ -175,50 +203,7 @@ function openInstructorWindow(){
 
       initializeInstructorWindowContent();
 
-
-
-        // let creatorDiv = instructorWindow.document.getElementById('creator-div');
-        // let dateCreatedDiv = instructorWindow.document.getElementById('date-created-div');
-        // let gameCommentsDiv = instructorWindow.document.getElementById('game-comments-div');
-      
-        // let questionDiv = instructorWindow.document.getElementById('question-div');
-        // let answerDiv = instructorWindow.document.getElementById('answer-div');
-        // let sourceDiv = instructorWindow.document.getElementById('source-div');
-        // let commentsDiv = instructorWindow.document.getElementById('comments-div');
-    
-        // creatorDiv.innerHTML = "example creator";
-        // dateCreatedDiv.innerHTML = "example date created";
-        // gameCommentsDiv.innerHTML = "example game comments";   
-      
-        // questionDiv.innerHTML = "example question";
-        // answerDiv.innerHTML = "example answer";
-        // sourceDiv.innerHTML = "example source";
-        // commentsDiv.innerHTML = "example comments";
-
     }
-//     let head = Document.getElementByTagName('HEAD')[0];
-//     let link = Document.creatElement('link');
-//     link.rel = 'stylesheet';
-//     link.type = 'text/css';
-//     link.href = 'instructor-window.css';
-//     head.appendChild(link);
-    
-    // create the instructor window elements:
-//     instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
-//     instructorWindow.document.title = "Instructor Window";
-	
-
-	
-//     answerDiv.id = "answer-div";
-//     questionDiv.id = "question-div";
-//     sourceDiv.id = "source-div";
-//     commentsDiv.id = "comments-div";
-	
-//     instructorWindow.document.body.appendChild(answerDiv);
-//     instructorWindow.document.body.appendChild(questionDiv);
-//     instructorWindow.document.body.appendChild(sourceDiv);
-//     instructorWindow.document.body.appendChild(commentsDiv);
-  
 
 }
 
@@ -487,63 +472,6 @@ function createJeopardyTable(roundNum) {
     changeQAfontSize(font_size);
   }
 
-
-
-  // document.getElementById("finalGrid").style.height = "80vh";
-
-  // let font_size = ((document.body.offsetHeight / rows) * 0.5) + "px";
-
-  // console.log("font_size: " + font_size);
-
-  // // create a div for each category column container:
-  // for(let x = 0; x < cols; x++){
-  //     let categoryColumn = document.createElement('div');
-  //     categoryColumn.classList.add("category-container");
-  //       // set the category container widths:
-  //       categoryColumn.style.width = (100.0/cols) + "%";
-
-  //     // add a qa_item div for each qa_item and put it into the column_container:
-  //     for(let obs = 0; obs < rows+1; obs++){
-
-  //         if (obs == 0) {
-  //             // it's a title row. Make div's:
-  //             let categoryTitle = document.createElement('div');
-  //             categoryTitle.classList.add("qa_title");
-  //             categoryTitle.innerHTML = unescape(gameOb.rounds[currentRound].categories[x].title);
-  //             categoryColumn.appendChild(categoryTitle);
-  //           } else {
-
-  //             // regular cell, make divs's:
-  //             let obCell = document.createElement('div');
-  //             obCell.classList.add("qa_item");
-  //             obCell.classList.add("incomplete");
-  //             obCell.id = x + "," + (obs-1);
-  //             obCell.addEventListener('click', function(){
-  //                 console.log("clicked on cell");
-  //                 let currRow = obs-1;
-  //                 console.log(currRow);
-  //                 playQA(currRow, x, this);
-  //             }, false);
-
-  //             // we have enough qa_items.  fill the cell with the qa_item points:
-  //             obCell.innerHTML = gameOb.rounds[currentRound].categories[x].qaObs[obs-1].points;
-
-  //             categoryColumn.appendChild(obCell);
-
-
-
-  //           //  obCell.style.fontFize = font_size;
-
-  //         }
-
-  //     }
-
-  //     document.getElementById("finalGrid").appendChild(categoryColumn);
-
-  //     changeQAfontSize(font_size);
-
-  // }
-
 }
 
 
@@ -664,7 +592,7 @@ function clickOverlay(ob){
 
       // fill the overlay with the fj answer:
       updateInstructorWindow_QA(currentRound, currentCategory, currentRow);
-
+      playFinalJeopardy();
       changeOverlayState();
       
       break;
@@ -680,6 +608,8 @@ function clickOverlay(ob){
 
     // clicked on the final jeopardy question/source.  make it go away:
     state.current_display_state = "main_board";
+
+    changeOverlayState();
 
     document.getElementById("overlay-box").style.display = "none";
 
@@ -700,12 +630,16 @@ function checkForRoundCompletion(){
     if(gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded){
   
       // we have final Jeopardy! play it!:
-      displayFinalJeopardyAnnouncement();
+      state.current_display_state = "final_jeopardy";
+      changeOverlayState();
     }
     else{
 
       // no final jeopardy.  check for a next round:
       if(currentRound < gameOb.rounds.length-1){
+        state.current_display_state = "main_board";
+        changeOverlayState();
+        document.getElementById("overlay-box").style.display = "none";
         alert("You have finished this round.  Click OK to go to next round");
         // we have another round. Load it:
         currentRound++;
@@ -716,6 +650,9 @@ function checkForRoundCompletion(){
         // we have no more rounds.  end of game:
         alert("Congratulations!  You have finished all rounds!");
         state.current_game_state = "game_ended";
+        state.current_display_state = "main_board";
+        changeOverlayState();
+        document.getElementById("overlay-box").style.display = "none";
       }
     }
   }
@@ -723,23 +660,16 @@ function checkForRoundCompletion(){
 }
 
 
+function playFinalJeopardy(){
+  // populate the overlay:
 
-function displayFinalJeopardyAnnouncement(){
-
-  // change gamestate:
-  state.current_game_state = "final_jeopardy";
-
-  changeOverlayState();
 
   // display the overlay:
-  let overlayBox = document.getElementById("overlay-box");
 
-  overlayBox.style.display = "block";
-  
-  // say: "Final Jeopardy!":
 
-  document.getElementById("overlay-question").innerHTML = "Final Jeopardy!";
+}
 
+function messageInstructor(message){
 
 }
 
@@ -747,6 +677,14 @@ function displayFinalJeopardyAnnouncement(){
 function changeOverlayState(){
 
   switch(state.current_display_state){
+    case "main_board":
+      console.log("show main board.");
+      document.getElementById("overlay-points").style.display = "none";
+      document.getElementById("overlay-answer").style.display = "none";
+      document.getElementById("overlay-question").style.display = "none";
+      document.getElementById("overlay-source").style.display = "none";
+      break;
+
     case "show_answer":
       console.log("hide question & source.");
       document.getElementById("overlay-points").style.display = "block";
@@ -762,6 +700,16 @@ function changeOverlayState(){
       document.getElementById("overlay-question").style.display = "block";
       document.getElementById("overlay-source").style.display = "block";
       break;
+
+      case "final_jeopardy":
+        console.log(state.current_display_state);
+        document.getElementById("overlay-points").style.display = "none";
+        document.getElementById("overlay-answer").style.display = "block";
+        document.getElementById("overlay-answer").innerHTML = "Final Jeopardy!";
+        document.getElementById("overlay-question").style.display = "none";
+        document.getElementById("overlay-source").style.display = "none";
+        break;
+
     case "final_jeopardy_answer":
       console.log(state.current_display_state);
       document.getElementById("overlay-points").style.display = "none";
