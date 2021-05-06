@@ -1,11 +1,12 @@
 Jeopardy TO DO:
 
-- fix double jeopardy
+- fix daily double
     - it will not display "double jeopardy before showing the answer. also, dj (double jeopardy) doesn't have points.
 - warn if loading new game before finishing last one
 
 - fix instructor window:
     - add timer/count down
+    - add "use timer" button
     - add action log
     - add way to choose rounds
     - add buttons to:

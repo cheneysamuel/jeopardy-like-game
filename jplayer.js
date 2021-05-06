@@ -521,13 +521,20 @@ function playQA(row, col, ob){
   }
   else{
 
+    let overlayBox = document.getElementById("overlay-box");
+    currentCategory = col;
+    currentRow = row;
+    // check for daily double:
+
+    if(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].isDailyDouble == true){
+      state.current_display_state = "show_daily_double";
+
+      changeOverlayState();
+    }
+    else{
+
       // change gamestate:
       state.current_display_state = "show_answer";
-
-      currentCategory = col;
-      currentRow = row;
-
-      let overlayBox = document.getElementById("overlay-box");
 
       let currentQA = gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow];
 
@@ -542,16 +549,18 @@ function playQA(row, col, ob){
       document.getElementById("overlay-points").style.display = "flex";
       document.getElementById("overlay-answer").style.display = "flex";
 
-      // display the overlay:
-      overlayBox.style.display = "flex";
-
       // update the instructor window information with QA info:
       updateInstructorWindow_QA(currentRound, currentCategory, currentRow);
 
       changeOverlayState();
 
-      ob.classList.remove("incomplete");
-      ob.classList.add("selected");
+    }
+
+    // display the overlay:
+    overlayBox.style.display = "flex";
+
+    ob.classList.remove("incomplete");
+    ob.classList.add("selected");
 
   }
 
@@ -561,6 +570,12 @@ function playQA(row, col, ob){
 function clickOverlay(ob){
 
   switch(state.current_display_state){
+    case "show_daily_double":
+      state.current_display_state = "show_answer";
+      document.getElementById("overlay-box").style.display = "flex";
+      changeOverlayState();
+
+      break;
     case "show_answer":
 
     // now show the question and source:
@@ -710,12 +725,26 @@ function changeOverlayState(){
       sourceDiv.style.display = "none";
       break;
 
+      case "show_daily_double":
+        console.log("show daily double.");
+        pointsDiv.style.display = "block";
+        answerDiv.style.display = "block";
+        questionDiv.style.display = "none";
+        sourceDiv.style.display = "none";
+        break;
+
     case "show_answer":
-      console.log("hide question & source.");
-      pointsDiv.style.display = "block";
+      console.log("show answer, hide question & source.");
       answerDiv.style.display = "block";
       questionDiv.style.display = "none";
       sourceDiv.style.display = "none";
+      if(!gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow].isDailyDouble){
+        // it's a daily double.  don't show points as the team/individual will wager:
+        pointsDiv.style.display = "block";
+      }
+      else{
+        pointsDiv.style.display = "none";
+      }
       break;
     
     case "give_question_source":
@@ -761,10 +790,17 @@ function changeOverlayState(){
     case "main_board":
     case "show_answer":
     case "give_question_source":
-      pointsDiv.innerHTML = currentQA.points;
       answerDiv.innerHTML = unescape(currentQA.answer);
       questionDiv.innerHTML = unescape(currentQA.question);
       sourceDiv.innerHTML = unescape(currentQA.source);
+      if(!gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow].isDailyDouble){
+        // it's a daily double.  don't show points as the team/individual will wager:
+        pointsDiv.innerHTML = currentQA.points;
+      }
+    break;
+    case "show_daily_double":
+      pointsDiv.innerHTML = "Daily Double!";
+      answerDiv.innerHTML = "Wager?";
     break;
     case "final_jeopardy":
       answerDiv.innerHTML = "Final Jeopardy!";
