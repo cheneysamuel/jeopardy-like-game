@@ -213,15 +213,21 @@ function openInstructorWindow(){
 
     initializeInstructorWindowContent();
 
+    let infoOb = gameOb.gameInfo;
+
+    // load the gameInfo information:
+    initializeInstructorWindowWithGameInformation(unescape(infoOb.creator), unescape(infoOb.dateCreated), unescape(infoOb.comments));
+  
+    let rName = unescape(gameOb.rounds[currentRound].roundInfo.roundName);
+  
+    updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds.length, gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
+
 }
 
 
 function initializeInstructorWindowContent(){
   
   // due to CSRF protections, we need to build this from scratch:
-
-  alert("initializing...");
-  
 
   instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
   instructorWindow.document.title = "Instructor Window";
@@ -341,10 +347,10 @@ function initializeInstructorWindowWithGameInformation(str1, str2, str3){
 
 function updateInstructorWindow_roundInfo(str1, str2, str3, str4){
 
-  instructorWindow.document.getElementById("round-name-div").innerHTML = str1;
-  instructorWindow.document.getElementById("round-number-div").innerHTML = str2;
-  instructorWindow.document.getElementById("total-rounds-div").innerHTML = str3;
-  instructorWindow.document.getElementById("final-jeopardy-included-div").innerHTML = str4;
+  instructorWindow.document.getElementById("round-name-div").innerHTML = "Round Name: " + str1;
+  instructorWindow.document.getElementById("round-number-div").innerHTML = "Round #: " + str2;
+  instructorWindow.document.getElementById("total-rounds-div").innerHTML = " of " + str3 + " rounds";
+  instructorWindow.document.getElementById("final-jeopardy-included-div").innerHTML = "Final Jeopardy this round: " + str4;
 
 }
 
@@ -378,14 +384,6 @@ function updateInstructorWindow_QA(round, category, row){
       break;
     }
   }
-
-    if(state.current_game_state == "final_jeopardy"){
-
-
-    }
-  else{
-
-  }
 	
 }
 
@@ -407,7 +405,7 @@ function populateFromLoadedGameOb() {
 
   let rName = unescape(gameOb.rounds[currentRound].roundInfo.roundName);
 
-  updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds.length);
+  updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds.length, gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
 
 
   // create the jeopardy table for the first round (round 0):

@@ -825,7 +825,7 @@ function validateNum() {
 
   let valField = document.getElementById("qaPoints");
   // look at the value of the "qaPoints" field, and change the color of the field if it is NaN:
-  if (isNaN(valField.points)) {
+  if (isNaN(parseInt(valField.value))) {
     // color the field red:
     valField.classList.add("invalidField");
   } else {

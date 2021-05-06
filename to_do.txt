@@ -5,7 +5,6 @@ Jeopardy TO DO:
 - warn if loading new game before finishing last one
 
 - fix instructor window:
-    - reload game and round information when user reopens the window after closing it during gameplay
     - add timer/count down
     - add action log
     - add way to choose rounds
@@ -15,5 +14,8 @@ Jeopardy TO DO:
         - change:
             - text size
         - play sounds?
+
+
+Game Creator TO DO:
 
 
