@@ -27,15 +27,12 @@ body {
 }
 
 th.qa_title {
-    justify-content: center;
-    align-items: center;
     padding: 10px;
     margin: 6px;
     background-color: blue;
     border-radius: 15px;
-    text-align: center;
-    height: 64px;
-
+    min-height: 64px;
+    line-height: 1;
 
 }
 

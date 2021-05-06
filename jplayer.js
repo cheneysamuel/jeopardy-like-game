@@ -200,10 +200,18 @@ function openInstructorWindow(){
     if(!instructorWindow || instructorWindow.closed){
       // the window was never opened. open it and load the appropriate game and round information:
       instructorWindow = window.open("", "Instructor Controls", "width=800,height=800");
-
-      initializeInstructorWindowContent();
+      instructorWindow.document.body.innerHTML = "";
 
     }
+    else{
+      // it was open from a previous game.  destroy it and reinitialize:
+      instructorWindow = null;
+      instructorWindow = window.open("", "Instructor Controls", "width=800,height=800");
+      instructorWindow.document.body.innerHTML = "";
+
+    }
+
+    initializeInstructorWindowContent();
 
 }
 
@@ -212,7 +220,8 @@ function initializeInstructorWindowContent(){
   
   // due to CSRF protections, we need to build this from scratch:
 
-  //alert("initializing...");
+  alert("initializing...");
+  
 
   instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
   instructorWindow.document.title = "Instructor Window";
@@ -615,6 +624,16 @@ function clickOverlay(ob){
 
     // do we have another round?
 
+    if(currentRound < (gameOb.rounds.length - 1)){
+      // we have another round.  Load it:
+      currentRound++;
+      createJeopardyTable(currentRound);
+    }
+    else{
+      // end of the end.
+      alert("You have finished all rounds.");
+    }
+
       break;
   }
 
@@ -631,7 +650,10 @@ function checkForRoundCompletion(){
   
       // we have final Jeopardy! play it!:
       state.current_display_state = "final_jeopardy";
+
       changeOverlayState();
+
+      document.getElementById("overlay-box").style.display = "flex";
     }
     else{
 
@@ -676,54 +698,59 @@ function messageInstructor(message){
 
 function changeOverlayState(){
 
+  let pointsDiv = document.getElementById("overlay-points");
+  let answerDiv = document.getElementById("overlay-answer");
+  let questionDiv = document.getElementById("overlay-question");
+  let sourceDiv = document.getElementById("overlay-source");
+
   switch(state.current_display_state){
     case "main_board":
       console.log("show main board.");
-      document.getElementById("overlay-points").style.display = "none";
-      document.getElementById("overlay-answer").style.display = "none";
-      document.getElementById("overlay-question").style.display = "none";
-      document.getElementById("overlay-source").style.display = "none";
+      pointsDiv.style.display = "none";
+      answerDiv.style.display = "none";
+      questionDiv.style.display = "none";
+      sourceDiv.style.display = "none";
       break;
 
     case "show_answer":
       console.log("hide question & source.");
-      document.getElementById("overlay-points").style.display = "block";
-      document.getElementById("overlay-answer").style.display = "block";
-      document.getElementById("overlay-question").style.display = "none";
-      document.getElementById("overlay-source").style.display = "none";
+      pointsDiv.style.display = "block";
+      answerDiv.style.display = "block";
+      questionDiv.style.display = "none";
+      sourceDiv.style.display = "none";
       break;
     
     case "give_question_source":
       console.log("hide points & answer");
-      document.getElementById("overlay-points").style.display = "none";
-      document.getElementById("overlay-answer").style.display = "none";
-      document.getElementById("overlay-question").style.display = "block";
-      document.getElementById("overlay-source").style.display = "block";
+      pointsDiv.style.display = "none";
+      answerDiv.style.display = "none";
+      questionDiv.style.display = "block";
+      sourceDiv.style.display = "block";
       break;
 
       case "final_jeopardy":
-        console.log(state.current_display_state);
-        document.getElementById("overlay-points").style.display = "none";
-        document.getElementById("overlay-answer").style.display = "block";
-        document.getElementById("overlay-answer").innerHTML = "Final Jeopardy!";
-        document.getElementById("overlay-question").style.display = "none";
-        document.getElementById("overlay-source").style.display = "none";
+        console.log("display final jeopardy");
+        pointsDiv.style.display = "none";
+        answerDiv.style.display = "block";
+        answerDiv.innerHTML = "Final Jeopardy!";
+        questionDiv.style.display = "none";
+        sourceDiv.style.display = "none";
         break;
 
     case "final_jeopardy_answer":
-      console.log(state.current_display_state);
-      document.getElementById("overlay-points").style.display = "none";
-      document.getElementById("overlay-answer").style.display = "block";
-      document.getElementById("overlay-question").style.display = "none";
-      document.getElementById("overlay-source").style.display = "none";
+      console.log("show final jeopardy answer");
+      pointsDiv.style.display = "none";
+      answerDiv.style.display = "block";
+      questionDiv.style.display = "none";
+      sourceDiv.style.display = "none";
       break;
     
     case "final_jeopardy_question_source":
-      console.log(state.current_display_state);
-      document.getElementById("overlay-points").style.display = "none";
-      document.getElementById("overlay-answer").style.display = "none";
-      document.getElementById("overlay-question").style.display = "block";
-      document.getElementById("overlay-source").style.display = "block";
+      console.log("show final jeopardy question and source");
+      pointsDiv.style.display = "none";
+      answerDiv.style.display = "none";
+      questionDiv.style.display = "block";
+      sourceDiv.style.display = "block";
       break;
 
     // first clicked. show points and answer:
@@ -732,10 +759,27 @@ function changeOverlayState(){
 
   let currentQA = gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow];
 
-  document.getElementById("overlay-points").innerHTML = currentQA.points;
-  document.getElementById("overlay-answer").innerHTML = unescape(currentQA.answer);
-  document.getElementById("overlay-question").innerHTML = unescape(currentQA.question);
-  document.getElementById("overlay-source").innerHTML = unescape(currentQA.source);
+  switch(state.current_display_state){
+    case "main_board":
+    case "show_answer":
+    case "give_question_source":
+      pointsDiv.innerHTML = currentQA.points;
+      answerDiv.innerHTML = unescape(currentQA.answer);
+      questionDiv.innerHTML = unescape(currentQA.question);
+      sourceDiv.innerHTML = unescape(currentQA.source);
+    break;
+    case "final_jeopardy":
+      answerDiv.innerHTML = "Final Jeopardy!";
+    break;
+    case "final_jeopardy_answer":
+    case "final_jeopardy_question_source":
+      let fjOb = gameOb.rounds[currentRound].roundInfo.finalJeopardy;
+      pointsDiv.innerHTML = "";
+      answerDiv.innerHTML = unescape(fjOb.answer);
+      questionDiv.innerHTML = unescape(fjOb.question);
+      sourceDiv.innerHTML = unescape(fjOb.source);
+    break;
+  }
 
 }
 

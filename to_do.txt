@@ -1,0 +1,19 @@
+Jeopardy TO DO:
+
+- fix double jeopardy
+    - it will not display "double jeopardy before showing the answer. also, dj (double jeopardy) doesn't have points.
+- warn if loading new game before finishing last one
+
+- fix instructor window:
+    - reload game and round information when user reopens the window after closing it during gameplay
+    - add timer/count down
+    - add action log
+    - add way to choose rounds
+    - add buttons to:
+        - reset current rounds
+        - hide the title section on main screen (to be revealed again if the instructor window is closed)
+        - change:
+            - text size
+        - play sounds?
+
+
