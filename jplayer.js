@@ -293,11 +293,15 @@ function initializeInstructorWindowContent(){
 
   instructorWindow.document.body.appendChild(topInfo);
 
-
   // QA information section:
   let QAdiv = instructorWindow.document.createElement("div");
   QAdiv.classList.add("qa-div");
-
+	
+  // game actions log section:
+  let logDiv = instructor Window.document.createElement("div");
+  logDiv.classList.add("log-div");
+  logDiv.id = "logDiv";
+	
     let answerDiv = instructorWindow.document.createElement("div");
     answerDiv.classList.add("aq-field-div");
     answerDiv.id = "answer-div";
@@ -321,7 +325,8 @@ function initializeInstructorWindowContent(){
     let timerDiv = instructorWindow.document.createElement("div");
     timerDiv.classList.add("aq-field-div");
     timerDiv.id = "timer-div";
-
+	
+  QAdiv.appendChild(logDiv);
   QAdiv.appendChild(answerDiv);
   QAdiv.appendChild(questionDiv);
   QAdiv.appendChild(sourceDiv);
@@ -509,6 +514,7 @@ function changeQAfontSize(size){
 function playQA(row, col, ob){
 
   console.log("row: " + row + ", column: " + col);
+
   // has this cell been played yet?
   if(ob.classList.contains("finished")){
     
@@ -704,8 +710,50 @@ function playFinalJeopardy(){
 
 }
 
-function messageInstructor(message){
 
+
+function writeToGameLog(message){
+	
+	if(message == null){
+		// if i'm just asking to writeToGameLog. Send everything.  user may have closed the instructor window and needs all log items:
+		// iterate through the entire log and create an object to send over:
+	}
+	else{
+		// validate message has only regular characters:
+		  let patt1 = /[^A-Za-z0-9-. ?]/g;
+		  let result = message.replace(patt1, "");
+		// write to the log object:
+		gameLog.addEntry(result);
+
+		// if the instructor window is open, update it:
+		if(!instructorWindow || instructorWindow.closed){
+			// instructor window now open. send to console.log:
+			console.log(result);
+		}
+		else{
+			// update the instructor window log div:
+			let LogEntryDiv = instructorWindow.document.createElement("div");
+			LogEntryDiv.classList.add("logEntryContainer");
+			let logdtgDiv = instructorWindow.document.createElement("span");
+			logdtgDiv.classList.add("logdtgDiv");
+			logdtgDiv.innerHTML = gameLog.logArray[logArray.length-1].dtg; // logStr
+			
+			let logStrDiv = instructorWindow.document.createElement("span");
+			logStrDiv.classList.add("logStrDiv");
+			logStrDiv.innerHTML = gameLog.logArray[logArray.length-1].logStr;
+			
+			logEntryDiv.appendChild(logdtgDiv);
+			logEntryDiv.appendChild(logStrDiv);
+			
+			// how append child to the actual log object:
+			
+			instructorWindow.document.getElementById("logDiv").appendChild(logEntryDiv);
+			
+			// scroll the log to the bottom?
+			// log div needs to be flex column.
+
+		}
+	}
 }
 
 
