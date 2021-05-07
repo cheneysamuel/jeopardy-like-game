@@ -528,7 +528,7 @@ function playQA(row, col, ob){
 
     if(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].isDailyDouble == true){
       state.current_display_state = "show_daily_double";
-
+      document.getElementById("overlay-box").style.display = "flex";
       changeOverlayState();
     }
     else{
@@ -572,7 +572,7 @@ function clickOverlay(ob){
   switch(state.current_display_state){
     case "show_daily_double":
       state.current_display_state = "show_answer";
-      document.getElementById("overlay-box").style.display = "flex";
+      // document.getElementById("overlay-box").style.display = "flex";
       changeOverlayState();
 
       break;
