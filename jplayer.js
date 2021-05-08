@@ -54,6 +54,11 @@ let state = { "file_states":["game_not_loaded",
              "current_display_state":"blank"
             }
 
+const eventTypes = {
+  GAME:"game",
+  ROUND:"round",
+  DISPLAY:"display"
+}
 
 let currentCategory = 0;
 let currentRow = 0;
@@ -64,10 +69,13 @@ class LogOb {
   constructor() {
     this.logArray = [];
 
-    this.addEntry = function (logStr) {
+    this.addEntry = function (logStr, eventType) {
       let dtg = new Date();
-      let dtgString = dtg.getHours() + ":" + dtg.getMinutes() + ":" + dtg.getSeconds();
-      this.logArray.push({ "logStr": logStr, "dtg": dtgString });
+      let ss = ((dtg.getSeconds()-10) < 0)?("0"+dtg.getSeconds()):dtg.getSeconds();
+      let mm = ((dtg.getMinutes()-10) < 0)?("0"+dtg.getMinutes()):dtg.getMinutes();
+      let hh = ((dtg.getHours()-10) < 0)?("0"+dtg.getHours()):dtg.getHours();
+      let dtgString = hh + ":" + mm + ":" + ss;
+      this.logArray.push({ "logStr": logStr, "dtg": dtgString, "dtgRaw":dtg.getTime(), "eventType":eventType });
     };
   }
 }
@@ -181,6 +189,8 @@ function showFile() {
       gameOb = new GameOb();
 
       Object.assign(gameOb, JSON.parse(event.target.result));
+
+      writeToGameLog("Game file loaded.", eventTypes.GAME);
 
       // load the round data:
       populateFromLoadedGameOb();
@@ -298,7 +308,7 @@ function initializeInstructorWindowContent(){
   QAdiv.classList.add("qa-div");
 	
   // game actions log section:
-  let logDiv = instructor Window.document.createElement("div");
+  let logDiv = instructorWindow.document.createElement("div");
   logDiv.classList.add("log-div");
   logDiv.id = "logDiv";
 	
@@ -336,6 +346,7 @@ function initializeInstructorWindowContent(){
 
   instructorWindow.document.body.appendChild(QAdiv);
 
+  writeToGameLog();
 
 }
 
@@ -423,7 +434,7 @@ function populateFromLoadedGameOb() {
 
 
 function createJeopardyTable(roundNum) {
-
+  writeToGameLog(("Beginning round #: " + (roundNum + 1)), eventTypes.ROUND);
   // change gamestate:
   state.current_file_state = "game_loaded";
   state.current_game_state = "game_started";
@@ -494,10 +505,10 @@ function changeQAfontSize(size){
       let qaArray = Array.from(document.getElementsByClassName("qa_item"));
       let titleArray = Array.from(document.getElementsByClassName("qa_title"));
 
-      console.log("titleArray: " + titleArray);
+      //console.log("titleArray: " + titleArray);
 
       let cellHeight = (document.body.offsetHeight/(gameOb.rounds[currentRound].categories[currentCategory].qaObs.length+2)) - document.getElementsByClassName("qa_title")[0].style.height;
-      console.log("cellHeight: " + cellHeight);
+      //console.log("cellHeight: " + cellHeight);
       qaArray.forEach(function(qa){
         // iterate and change size:
         qa.style.fontSize = size + "px";
@@ -514,7 +525,10 @@ function changeQAfontSize(size){
 function playQA(row, col, ob){
 
   console.log("row: " + row + ", column: " + col);
-
+  writeToGameLog(("Showing answer to " + gameOb.rounds[currentRound].categories[currentCategory].title + " for " + gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].points), eventTypes.DISPLAY);
+//  writeToGameLog("    -answer: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].answer));
+//  writeToGameLog("    -question: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].question));
+//  writeToGameLog("    -source: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].source));
   // has this cell been played yet?
   if(ob.classList.contains("finished")){
     
@@ -583,15 +597,18 @@ function clickOverlay(ob){
 
       break;
     case "show_answer":
-
-    // now show the question and source:
+      let sec = (Date.now() - gameLog.logArray[gameLog.logArray.length-1].dtgRaw)/1000;
+      let min = Math.floor(sec/60);
+      sec = Math.floor(sec%60);
+      writeToGameLog(("Giving question & source. Took " + ((min > 0)?(min + " minute"+ ((min > 1)?"s":"") + " and "):" ") + sec + " second" + ((sec == 1)?"":"s") + "."), eventTypes.DISPLAY);
+      // now show the question and source:
       state.current_display_state = "give_question_source";
 
       changeOverlayState();
 
       break;
     case "give_question_source":
-
+      
       state.current_display_state = "main_board";
 
       // clicking out of question/source, check for end of round & final Jeopardy:
@@ -614,6 +631,7 @@ function clickOverlay(ob){
 
       break;
     case "final_jeopardy":
+      writeToGameLog("Begin final jeopardy", eventTypes.ROUND);
 
       // final jeopardy! is being displayed.  click on this should give you your fj answer:
       state.current_display_state = "final_jeopardy_answer";
@@ -650,7 +668,9 @@ function clickOverlay(ob){
     }
     else{
       // end of the end.
+      writeToGameLog("Finished all rounds", eventTypes.GAME);
       alert("You have finished all rounds.");
+      state.current_game_state = "game_ended";
     }
 
       break;
@@ -668,6 +688,7 @@ function checkForRoundCompletion(){
     if(gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded){
   
       // we have final Jeopardy! play it!:
+      writeToGameLog("Begin final jeopardy", eventTypes.ROUND);
       state.current_display_state = "final_jeopardy";
 
       changeOverlayState();
@@ -678,6 +699,7 @@ function checkForRoundCompletion(){
 
       // no final jeopardy.  check for a next round:
       if(currentRound < gameOb.rounds.length-1){
+        writeToGameLog("Finished with current round", eventTypes.ROUND);
         state.current_display_state = "main_board";
         changeOverlayState();
         document.getElementById("overlay-box").style.display = "none";
@@ -689,6 +711,7 @@ function checkForRoundCompletion(){
       else{
         
         // we have no more rounds.  end of game:
+        writeToGameLog("Finished all rounds", eventTypes.GAME);
         alert("Congratulations!  You have finished all rounds!");
         state.current_game_state = "game_ended";
         state.current_display_state = "main_board";
@@ -712,18 +735,21 @@ function playFinalJeopardy(){
 
 
 
-function writeToGameLog(message){
-	
-	if(message == null){
+function writeToGameLog(message, eventType){
+	console.log("writing to log: " + message + ", eventType: " + eventType);
+	if(message == undefined){
 		// if i'm just asking to writeToGameLog. Send everything.  user may have closed the instructor window and needs all log items:
 		// iterate through the entire log and create an object to send over:
+    if(gameLog.logArray.length > 0){
+      gameLog.logArray.forEach(function(item,index){addToInstructorLog(index)});
+    }
 	}
 	else{
 		// validate message has only regular characters:
-		  let patt1 = /[^A-Za-z0-9-. ?]/g;
+		  let patt1 = /[^A-Za-z0-9-.: &?]/g;
 		  let result = message.replace(patt1, "");
 		// write to the log object:
-		gameLog.addEntry(result);
+		gameLog.addEntry(result, eventType);
 
 		// if the instructor window is open, update it:
 		if(!instructorWindow || instructorWindow.closed){
@@ -731,29 +757,36 @@ function writeToGameLog(message){
 			console.log(result);
 		}
 		else{
-			// update the instructor window log div:
-			let LogEntryDiv = instructorWindow.document.createElement("div");
-			LogEntryDiv.classList.add("logEntryContainer");
-			let logdtgDiv = instructorWindow.document.createElement("span");
-			logdtgDiv.classList.add("logdtgDiv");
-			logdtgDiv.innerHTML = gameLog.logArray[logArray.length-1].dtg; // logStr
-			
-			let logStrDiv = instructorWindow.document.createElement("span");
-			logStrDiv.classList.add("logStrDiv");
-			logStrDiv.innerHTML = gameLog.logArray[logArray.length-1].logStr;
-			
-			logEntryDiv.appendChild(logdtgDiv);
-			logEntryDiv.appendChild(logStrDiv);
-			
-			// how append child to the actual log object:
-			
-			instructorWindow.document.getElementById("logDiv").appendChild(logEntryDiv);
-			
-			// scroll the log to the bottom?
-			// log div needs to be flex column.
-
+      addToInstructorLog((gameLog.logArray.length-1),eventType);
 		}
 	}
+}
+
+
+function addToInstructorLog(index,eventType){
+  // update the instructor window log div:
+  let logEntryDiv = instructorWindow.document.createElement("div");
+  logEntryDiv.classList.add("logEntryContainer");
+  logEntryDiv.classList.add(eventType);
+
+  let logdtgDiv = instructorWindow.document.createElement("span");
+  logdtgDiv.classList.add("logdtgDiv");
+  logdtgDiv.setAttribute('dtgraw', gameLog.logArray[index].dtgRaw);
+  logdtgDiv.innerHTML = gameLog.logArray[index].dtg; // logStr
+  
+  let logStrDiv = instructorWindow.document.createElement("span");
+  logStrDiv.classList.add("logStrDiv");
+  logStrDiv.innerHTML = gameLog.logArray[index].logStr;
+  
+  logEntryDiv.appendChild(logdtgDiv);
+  logEntryDiv.appendChild(logStrDiv);
+  
+  // how append child to the actual log object:
+  
+  instructorWindow.document.getElementById("logDiv").appendChild(logEntryDiv);
+  
+  // scroll the log to the bottom?
+  // log div needs to be flex column.
 }
 
 
@@ -775,6 +808,7 @@ function changeOverlayState(){
 
       case "show_daily_double":
         console.log("show daily double.");
+        writeToGameLog("Daily double selected.", eventTypes.DISPLAY);
         pointsDiv.style.display = "block";
         answerDiv.style.display = "block";
         questionDiv.style.display = "none";

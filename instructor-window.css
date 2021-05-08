@@ -1,6 +1,7 @@
 body {
   color: white;
   background-color: black;
+  font-family: sans-serif;
 }
 
 div {
@@ -22,5 +23,21 @@ div {
   text-align: center;
 }
 
+.logEntryContainer {
+  margin: 2px;
+  padding: 2px;
+  border: none;
+}
 
+.logdtgDiv {
+  background-color: red;
+  color: white;
+  margin: 3px 8px 3px 3px;
+  padding: 1px 4px 1px 4px;
+  border-radius: 12px;
+}
+
+.logStrDiv, .logdtgDiv {
+  font-family: sans-serif;
+}
 
