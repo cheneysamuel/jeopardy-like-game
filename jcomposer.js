@@ -61,72 +61,86 @@ let currQA = {};
 
 
 
-function GameOb() {
-  this.gameInfo = new GameInfoOb();
-  this.rounds = [];
+class GameOb {
+  constructor() {
+    this.gameInfo = new GameInfoOb();
+    this.rounds = [];
 
-  this.addRound = function() {
-    this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
-    roundCounter++;
+    this.addRound = function () {
+      this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
+      roundCounter++;
+    };
   }
 }
 
 
-function GameInfoOb() {
-  this.creator = "creator";
-  this.dateCreated = "date created";
-  this.comments = "comments.";
-  this.backgroundColor = "#0000FF";
-  this.fontColor = "#FFFFFF";
+class GameInfoOb {
+  constructor() {
+    this.creator = "creator";
+    this.dateCreated = "date created";
+    this.comments = "comments.";
+    this.backgroundColor = "#0000FF";
+    this.fontColor = "#FFFFFF";
+  }
 }
 
 
-function roundOb(id, info, data) {
-  this.roundID = id;
-  this.roundInfo = info;
-  this.categories = [];
+class roundOb {
+  constructor(id, info, data) {
+    this.roundID = id;
+    this.roundInfo = info;
+    this.categories = [];
 
-   this.addCategory = function() {
-     this.categories.push(new categoryOb("New Category"));
-   }
+    this.addCategory = function () {
+      this.categories.push(new categoryOb("New Category"));
+    };
+  }
 }
 
 
-function roundInfoOb(_roundName, _numOfQuestionRows) {
-  this.roundName = _roundName;
-  this.numberOfQuestionRows = _numOfQuestionRows;
-  this.finalJeopardyIncluded = false;
-  this.finalJeopardy = new finalJ("", "", "", "");
+class roundInfoOb {
+  constructor(_roundName, _numOfQuestionRows) {
+    this.roundName = _roundName;
+    this.numberOfQuestionRows = _numOfQuestionRows;
+    this.finalJeopardyIncluded = false;
+    this.finalJeopardy = new finalJ("", "", "", "");
+  }
 }
 
 
-function categoryOb(_title){
+class categoryOb {
+  constructor(_title) {
     this.title = _title;
     this.qaObs = [];
-    this.addQAob = function(pos, val){
-        this.qaObs.push(new QAob(true, pos, val, 30, "", "", "", "", false));
-    }
+    this.addQAob = function (pos, val) {
+      this.qaObs.push(new QAob(true, pos, val, 30, "", "", "", "", false));
+    };
+  }
 }
 
 
-function QAob(_selectable, _pos, _points, _timerInSeconds, _answer, _question, _source, _comments, _isDailyDouble) {
-  this.selectable = _selectable;
-  this.pos = _pos;
-  this.points = _points;
-  this.timerInSeconds = _timerInSeconds;
-  this.answer = _answer;
-  this.question = _question;
-  this.source = _source;
-  this.comments = _comments;
-  this.isDailyDouble = _isDailyDouble;
+class QAob {
+  constructor(_selectable, _pos, _points, _timerInSeconds, _answer, _question, _source, _comments, _isDailyDouble) {
+    this.selectable = _selectable;
+    this.pos = _pos;
+    this.points = _points;
+    this.timerInSeconds = _timerInSeconds;
+    this.answer = _answer;
+    this.question = _question;
+    this.source = _source;
+    this.comments = _comments;
+    this.isDailyDouble = _isDailyDouble;
+  }
 }
 
 
-function finalJ(_answer, _question, _source, _comments) {
-  this.answer = _answer;
-  this.question = _question;
-  this.source = _source;
-  this.comments = _comments;
+class finalJ {
+  constructor(_answer, _question, _source, _comments) {
+    this.answer = _answer;
+    this.question = _question;
+    this.source = _source;
+    this.comments = _comments;
+  }
 }
 
 
@@ -218,6 +232,7 @@ function populateRoundsFromFile() {
   for (var i = 0; i < roundsThisGame; i++) {
 
     // for every round, we need its name:
+    console.log("creating round for: " + gameOb.rounds[i].roundID);
     button_createRound(gameOb.rounds[i].roundID);
 
   }
@@ -266,10 +281,39 @@ function button_createRound(theRoundID) {
     }
   }
 
-  var roundNumString = "<li id='" + thisRoundID + "'><span class='round-name'>" + nameOfRound + "</span><button id='reb" + roundCounter + "' onclick='button_editRoundItem(this.id)' type='button'>Edit</button><button type='button' id='rdb" + roundCounter + "' onclick='button_deleteRoundItem(this.id)' type='button'>Delete</button></li>";
+  // create the round list item:
+  let roundItemContainer = document.createElement("li");
+  roundItemContainer.id = thisRoundID;
+
+  let roundName = document.createElement("span");
+  roundName.classList.add("round-name");
+  roundName.innerHTML = nameOfRound;
+
+  let editButton = document.createElement("button");
+  editButton.id = "reb" + roundCounter;
+  editButton.innerHTML = "edit";
+  editButton.addEventListener("click", function(){
+    button_editRoundItem(this.id);
+  });
+
+  let deleteButton = document.createElement("button");
+  deleteButton.id = "rdb" + roundCounter;
+  deleteButton.innerHTML = "delete";
+  deleteButton.addEventListener("click", function(){
+    button_deleteRoundItem(this.id);
+  });
+
+  roundItemContainer.appendChild(roundName);
+  roundItemContainer.appendChild(editButton);
+  roundItemContainer.appendChild(deleteButton);
+
+  document.getElementById("rounds").appendChild(roundItemContainer);
+
+
+  //var roundNumString = "<li id='" + thisRoundID + "'><span class='round-name'>" + nameOfRound + "</span><button id='reb" + roundCounter + "' onclick='button_editRoundItem(this.id)' type='button'>Edit</button><button type='button' id='rdb" + roundCounter + "' onclick='button_deleteRoundItem(this.id)' type='button'>Delete</button></li>";
 
   // add it to the list:
-  $(roundNumString).appendTo("#rounds");
+  //$(roundNumString).appendTo("#rounds");
 
   // refresh the list:
   refreshAll();
@@ -426,7 +470,7 @@ function purgeRoundInfo() {
 
 function button_editRoundItem(theID) {
 
-    console.log("editing round...");
+    console.log("editing round " + theID);
 
   //	alert($("#"+theID).parent().attr('id'));
   //	alert("theID: " + theID);

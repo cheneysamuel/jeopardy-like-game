@@ -14,19 +14,54 @@ div {
   display: flex;
 }
 
+.round-number-div {
+  height: 40px;
+  width: 40px;
+  font-size: 30px;
+  background-color: blue;
+  padding: 10px;
+  margin: 16px;
+  border-radius: 40px;
+}
+
+.round-number-div:hover {
+  background-color: rgb(24, 67, 255);
+}
+
+.aq-title-div {
+  background-color:orange;
+}
+
 .game-info-field, .round-info-field, .aq-field-div {
   background-color: black;
   color: white;
   margin: 10px;
   padding: 10px;
-  font-size: 40px;
-  text-align: center;
+  font-size: 20px;
+  text-align: left;
+}
+
+.bottom-div {
+  display: flex;
+}
+
+.log-div {
+  width: 40%;
+  height: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: left;
+  padding: 15px;
 }
 
 .logEntryContainer {
-  margin: 2px;
   padding: 2px;
   border: none;
+}
+
+.logEntryContainer:hover {
+  background-color: rgb(46, 46, 46);
+
 }
 
 .logdtgDiv {
@@ -41,3 +76,16 @@ div {
   font-family: sans-serif;
 }
 
+.round {
+  border: solid gray 1px;
+  border-radius: 20px;
+}
+
+.game {
+  border: solid gray 2px;
+  border-radius: 20px;
+}
+
+.display_question {
+  margin-left: 30px;
+}

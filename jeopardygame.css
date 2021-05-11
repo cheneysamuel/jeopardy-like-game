@@ -5,6 +5,48 @@ body {
     height: 100%;
 }
 
+#collapse_icon {
+    display: flex;
+    flex-flow: row;
+    background-color: gray;
+    border-radius: 20px;
+    padding: 4px;
+    margin: 4px;
+    cursor: default;
+}
+
+#collapse_icon.collapsed {
+    height: 20px;
+    width: 20px;
+}
+
+.icon_period {
+    font-size: 40px;
+}
+
+.icon_period:hover {
+    cursor: default;
+}
+
+#top {
+    display: flex;
+}
+
+#top_sub_container {
+    display: flex;
+    align-items: center;
+    transition: width 2s;
+    transition-timing-function: ease-in-out;
+}
+
+#top_sub_container.hidden {
+    width: 10px;
+}
+
+#file {
+    margin: 0px 20px 0px 20px;
+}
+
 #finalGrid {
 
     height: 100%;

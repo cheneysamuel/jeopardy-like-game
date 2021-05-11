@@ -7,6 +7,15 @@ $(document).ready(function() {
   // listen for the load file button:
   document.getElementById('file').addEventListener('change', showFile, false);
 
+  // listen for window/tab reload or close and close the instructor window with it:
+  window.addEventListener('beforeunload', (event) => {
+    if(instructorWindow != null || instructorWindow.closed){
+      instructorWindow.close();
+      instructorWindow = null;
+      event.returnValue = '';
+    }
+  });
+
   // listen for buttons:
   
   
@@ -15,6 +24,13 @@ $(document).ready(function() {
 		openInstructorWindow();
 		
 	});
+
+  $("#collapse_icon").on('click', function(){
+    console.log("toggling...");
+    toggleTitle();
+  });
+
+  //document.getElementById("collapse_icon").addEventListener('click', toggleTitle, false);
 
   // listen for field changes:
 
@@ -57,7 +73,11 @@ let state = { "file_states":["game_not_loaded",
 const eventTypes = {
   GAME:"game",
   ROUND:"round",
-  DISPLAY:"display"
+  DISPLAY_ANSWER:"display_answer",
+  DISPLAY_QUESTION:"display_question",
+  DISPLAY_DD:"display_dd",
+  DISPLAY_FJ:"display_fj"
+
 }
 
 let currentCategory = 0;
@@ -170,6 +190,24 @@ let currentRound = 0;
 let gameLog = new LogOb();
 
 
+function toggleTitle(){
+  // if title area is expanded, collapse it:
+  if($("#top_sub_container").css('display') == "flex"){
+    console.log("collapse it.");
+    $("#top_sub_container").css('display', 'none');
+    $("#collapse_icon").addClass("collapsed");
+    $(".icon_period").css('display', 'none');
+  }
+  else{
+    console.log("open it.");
+    $("#top_sub_container").css('display', 'flex');
+    $("#collapse_icon").removeClass("collapsed");
+    $(".icon_period").css('display', 'block');
+  }
+  // if title area is collapsed, expand it:
+}
+
+
 function showFile() {
   //	alert("showFile called...");
 
@@ -211,7 +249,6 @@ function openInstructorWindow(){
       // the window was never opened. open it and load the appropriate game and round information:
       instructorWindow = window.open("", "Instructor Controls", "width=800,height=800");
       instructorWindow.document.body.innerHTML = "";
-
     }
     else{
       // it was open from a previous game.  destroy it and reinitialize:
@@ -223,6 +260,8 @@ function openInstructorWindow(){
 
     initializeInstructorWindowContent();
 
+    toggleTitle();
+
     let infoOb = gameOb.gameInfo;
 
     // load the gameInfo information:
@@ -230,7 +269,7 @@ function openInstructorWindow(){
   
     let rName = unescape(gameOb.rounds[currentRound].roundInfo.roundName);
   
-    updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds.length, gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
+    updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
 
 }
 
@@ -238,6 +277,7 @@ function openInstructorWindow(){
 function initializeInstructorWindowContent(){
   
   // due to CSRF protections, we need to build this from scratch:
+  console.log("initializing instructor window content...");
 
   instructorWindow.document.write("<p>Move this window onto the extra screen area.</p>");
   instructorWindow.document.title = "Instructor Window";
@@ -286,9 +326,27 @@ function initializeInstructorWindowContent(){
     roundNumberDiv.classList.add("round-info-field");
     roundNumberDiv.id = "round-number-div";
 
-    let totalRoundsDiv = instructorWindow.document.createElement("div");
-    totalRoundsDiv.classList.add("round-info-field");
-    totalRoundsDiv.id = "total-rounds-div";
+    for(let round = 0; round < gameOb.rounds.length; round++){
+      console.log("creating clickable round element...");
+      let aRound = instructorWindow.document.createElement("span");
+      aRound.classList.add("round-number-div");
+      aRound.setAttribute('round-number', round);
+      aRound.innerHTML = (round + 1);
+      aRound.addEventListener('click', function(evt){
+        let newRoundNumber = parseInt(evt.target.getAttribute('round-number'))
+        console.log("round: " + newRoundNumber);
+        currentRound = newRoundNumber;
+        state.current_display_state = "main_board";
+        changeOverlayState();
+        createJeopardyTable(newRoundNumber);
+
+      });
+      roundNumberDiv.appendChild(aRound);
+    }
+
+    //let totalRoundsDiv = instructorWindow.document.createElement("div");
+    //totalRoundsDiv.classList.add("round-info-field");
+    //totalRoundsDiv.id = "total-rounds-div";
 
     let finalJeopardyIncludedDiv = instructorWindow.document.createElement("div");
     finalJeopardyIncludedDiv.classList.add("round-info-field");
@@ -296,7 +354,7 @@ function initializeInstructorWindowContent(){
 
   roundDiv.appendChild(roundNameDiv);
   roundDiv.appendChild(roundNumberDiv);
-  roundDiv.appendChild(totalRoundsDiv);
+  //roundDiv.appendChild(totalRoundsDiv);
   roundDiv.appendChild(finalJeopardyIncludedDiv);
 
   topInfo.appendChild(roundDiv);
@@ -304,13 +362,17 @@ function initializeInstructorWindowContent(){
   instructorWindow.document.body.appendChild(topInfo);
 
   // QA information section:
-  let QAdiv = instructorWindow.document.createElement("div");
-  QAdiv.classList.add("qa-div");
+  let bottomDiv = instructorWindow.document.createElement("div");
+  bottomDiv.classList.add("bottom-div");
 	
   // game actions log section:
   let logDiv = instructorWindow.document.createElement("div");
   logDiv.classList.add("log-div");
+  logDiv.classList.add("scroll");
   logDiv.id = "logDiv";
+
+  let QAdiv = instructorWindow.document.createElement("div");
+  QAdiv.classList.add("qa-div");
 	
     let answerDiv = instructorWindow.document.createElement("div");
     answerDiv.classList.add("aq-field-div");
@@ -337,14 +399,17 @@ function initializeInstructorWindowContent(){
     timerDiv.id = "timer-div";
 	
   QAdiv.appendChild(logDiv);
+  QAdiv.appendChild(pointsDiv);
   QAdiv.appendChild(answerDiv);
   QAdiv.appendChild(questionDiv);
   QAdiv.appendChild(sourceDiv);
   QAdiv.appendChild(commentsDiv);
-  QAdiv.appendChild(pointsDiv);
-  QAdiv.appendChild(timerDiv);
+  // QAdiv.appendChild(timerDiv);
 
-  instructorWindow.document.body.appendChild(QAdiv);
+  bottomDiv.appendChild(logDiv);
+  bottomDiv.appendChild(QAdiv);
+
+  instructorWindow.document.body.appendChild(bottomDiv);
 
   writeToGameLog();
 
@@ -354,19 +419,18 @@ function initializeInstructorWindowContent(){
 
 function initializeInstructorWindowWithGameInformation(str1, str2, str3){
 	
-    instructorWindow.document.getElementById("creator-div").innerHTML = str1;
-    instructorWindow.document.getElementById("date-created-div").innerHTML = str2;
-    instructorWindow.document.getElementById("game-comments-div").innerHTML = str3;
+    instructorWindow.document.getElementById("creator-div").innerHTML = "creator: " + str1;
+    instructorWindow.document.getElementById("date-created-div").innerHTML = "created: " + str2;
+    instructorWindow.document.getElementById("game-comments-div").innerHTML = "comments: " + str3;
 	
 }
 
 
-function updateInstructorWindow_roundInfo(str1, str2, str3, str4){
+function updateInstructorWindow_roundInfo(str1, str2, str3){
 
-  instructorWindow.document.getElementById("round-name-div").innerHTML = "Round Name: " + str1;
-  instructorWindow.document.getElementById("round-number-div").innerHTML = "Round #: " + str2;
-  instructorWindow.document.getElementById("total-rounds-div").innerHTML = " of " + str3 + " rounds";
-  instructorWindow.document.getElementById("final-jeopardy-included-div").innerHTML = "Final Jeopardy this round: " + str4;
+  instructorWindow.document.getElementById("round-name-div").innerHTML = "Round " + str2 + ": " + str1;
+  //instructorWindow.document.getElementById("round-number-div").innerHTML = "Round #: " + str2;
+  instructorWindow.document.getElementById("final-jeopardy-included-div").innerHTML = "Final Jeopardy this round: " + str3;
 
 }
 
@@ -387,16 +451,17 @@ function updateInstructorWindow_QA(round, category, row){
         instructorWindow.document.getElementById("source-div").innerHTML = unescape(fj.source);
         instructorWindow.document.getElementById("comments-div").innerHTML = unescape(fj.comments);
       break;
+      case "show_daily_double":
       case "show_answer":
       case "give_question_source":
         let thisQA = gameOb.rounds[round].categories[category].qaObs[row];
 
         instructorWindow.document.getElementById("answer-div").innerHTML = unescape(thisQA.answer);
         instructorWindow.document.getElementById("question-div").innerHTML = unescape(thisQA.question);
-        instructorWindow.document.getElementById("source-div").innerHTML = unescape(thisQA.source);
-        instructorWindow.document.getElementById("comments-div").innerHTML = unescape(thisQA.comments);
-        instructorWindow.document.getElementById("points-div").innerHTML = thisQA.points;
-        instructorWindow.document.getElementById("timer-div").innerHTML = thisQA.timerInSeconds;
+        instructorWindow.document.getElementById("source-div").innerHTML = "source: " + unescape(thisQA.source);
+        instructorWindow.document.getElementById("comments-div").innerHTML = "comments: " + unescape(thisQA.comments);
+        instructorWindow.document.getElementById("points-div").innerHTML = "Points: " + thisQA.points;
+        // instructorWindow.document.getElementById("timer-div").innerHTML = thisQA.timerInSeconds;
       break;
     }
   }
@@ -421,7 +486,7 @@ function populateFromLoadedGameOb() {
 
   let rName = unescape(gameOb.rounds[currentRound].roundInfo.roundName);
 
-  updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds.length, gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
+  updateInstructorWindow_roundInfo(rName, (currentRound + 1), gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded);
 
 
   // create the jeopardy table for the first round (round 0):
@@ -495,6 +560,11 @@ function createJeopardyTable(roundNum) {
     changeQAfontSize(font_size);
   }
 
+  //updateInstructorWindow_gameInfo(gameOb.gameInfo.creator, gameOb.gameInfo.dateCreated, gameOb.gameInfo.comments);
+
+  //updateInstructorWindow_roundInfo(gameOb.rounds[roundNum].roundInfo.roundName, roundNumber, gameOb.rounds[roundNum].roundInfo.finalJeopardyIncluded);
+
+  openInstructorWindow();
 }
 
 
@@ -525,7 +595,7 @@ function changeQAfontSize(size){
 function playQA(row, col, ob){
 
   console.log("row: " + row + ", column: " + col);
-  writeToGameLog(("Showing answer to " + gameOb.rounds[currentRound].categories[currentCategory].title + " for " + gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].points), eventTypes.DISPLAY);
+  
 //  writeToGameLog("    -answer: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].answer));
 //  writeToGameLog("    -question: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].question));
 //  writeToGameLog("    -source: " + unescape(gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].source));
@@ -541,6 +611,7 @@ function playQA(row, col, ob){
   }
   else{
 
+    writeToGameLog((gameOb.rounds[currentRound].categories[currentCategory].title + " for " + gameOb.rounds[currentRound].categories[currentCategory].qaObs[row].points), eventTypes.DISPLAY_ANSWER);
     let overlayBox = document.getElementById("overlay-box");
     currentCategory = col;
     currentRow = row;
@@ -550,6 +621,7 @@ function playQA(row, col, ob){
       state.current_display_state = "show_daily_double";
       document.getElementById("overlay-box").style.display = "flex";
       changeOverlayState();
+      updateInstructorWindow_QA(currentRound, currentCategory, currentRow);
     }
     else{
 
@@ -600,7 +672,7 @@ function clickOverlay(ob){
       let sec = (Date.now() - gameLog.logArray[gameLog.logArray.length-1].dtgRaw)/1000;
       let min = Math.floor(sec/60);
       sec = Math.floor(sec%60);
-      writeToGameLog(("Giving question & source. Took " + ((min > 0)?(min + " minute"+ ((min > 1)?"s":"") + " and "):" ") + sec + " second" + ((sec == 1)?"":"s") + "."), eventTypes.DISPLAY);
+      writeToGameLog(("Took " + ((min > 0)?(min + " minute"+ ((min > 1)?"s":"") + " and "):" ") + sec + " second" + ((sec == 1)?"":"s") + "."), eventTypes.DISPLAY_QUESTION);
       // now show the question and source:
       state.current_display_state = "give_question_source";
 
@@ -688,7 +760,7 @@ function checkForRoundCompletion(){
     if(gameOb.rounds[currentRound].roundInfo.finalJeopardyIncluded){
   
       // we have final Jeopardy! play it!:
-      writeToGameLog("Begin final jeopardy", eventTypes.ROUND);
+    //  writeToGameLog("Begin final jeopardy", eventTypes.ROUND);
       state.current_display_state = "final_jeopardy";
 
       changeOverlayState();
@@ -784,6 +856,7 @@ function addToInstructorLog(index,eventType){
   // how append child to the actual log object:
   
   instructorWindow.document.getElementById("logDiv").appendChild(logEntryDiv);
+  logEntryDiv.scrollIntoView({behavior: "smooth"});
   
   // scroll the log to the bottom?
   // log div needs to be flex column.
@@ -808,7 +881,7 @@ function changeOverlayState(){
 
       case "show_daily_double":
         console.log("show daily double.");
-        writeToGameLog("Daily double selected.", eventTypes.DISPLAY);
+        writeToGameLog("Daily double selected.", eventTypes.DISPLAY_DD);
         pointsDiv.style.display = "block";
         answerDiv.style.display = "block";
         questionDiv.style.display = "none";
@@ -838,7 +911,7 @@ function changeOverlayState(){
       break;
 
       case "final_jeopardy":
-        console.log("display final jeopardy");
+        writeToGameLog("Final Jeopardy.", eventTypes.DISPLAY_FJ);
         pointsDiv.style.display = "none";
         answerDiv.style.display = "block";
         answerDiv.innerHTML = "Final Jeopardy!";
@@ -847,7 +920,7 @@ function changeOverlayState(){
         break;
 
     case "final_jeopardy_answer":
-      console.log("show final jeopardy answer");
+      writeToGameLog("Show answer.", eventTypes.DISPLAY_ANSWER);
       pointsDiv.style.display = "none";
       answerDiv.style.display = "block";
       questionDiv.style.display = "none";
@@ -855,7 +928,7 @@ function changeOverlayState(){
       break;
     
     case "final_jeopardy_question_source":
-      console.log("show final jeopardy question and source");
+      writeToGameLog("Give question.", eventTypes.DISPLAY_QUESTION);
       pointsDiv.style.display = "none";
       answerDiv.style.display = "none";
       questionDiv.style.display = "block";

@@ -3,9 +3,6 @@ Jeopardy TO DO:
 - fix daily double
     - it will not display "double jeopardy before showing the answer. also, dj (double jeopardy) doesn't have points.
 - warn if loading new game before finishing last one
-- game level events
-- round level events
-- display level events
 - GAME NAME
 
 - fix instructor window:
