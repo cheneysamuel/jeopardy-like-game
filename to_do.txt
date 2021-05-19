@@ -2,10 +2,11 @@ Jeopardy TO DO:
 
 - fix daily double
     - it will not display "double jeopardy before showing the answer. also, dj (double jeopardy) doesn't have points.
-- warn if loading new game before finishing last one
-- GAME NAME
 
 - fix instructor window:
+    - when going to new round, we entirely recreate the instructor window.  
+        - return the window focus to instructorWindow.opener
+    - when playing final jeopardy, blank the points, as it is what's left over from the last question
     - when FJ info is shown, blank the points and time div's
     - make the action log scrollable
     - add timer/count down
@@ -20,5 +21,12 @@ Jeopardy TO DO:
 
 
 Game Creator TO DO:
+    - the behavior when clicking on a question to edit is wierd.  
+        - don't make it jump to the fields to edit
+        - give a visual indicator that the QA fields were changed.
+    - fix creation of categories
+    - fix creation of rounds
+
+
 
 

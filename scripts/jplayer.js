@@ -260,7 +260,7 @@ function openInstructorWindow(){
 
     initializeInstructorWindowContent();
 
-    toggleTitle();
+    //toggleTitle();
 
     let infoOb = gameOb.gameInfo;
 
@@ -331,14 +331,14 @@ function initializeInstructorWindowContent(){
       let aRound = instructorWindow.document.createElement("span");
       aRound.classList.add("round-number-div");
       aRound.setAttribute('round-number', round);
-      aRound.innerHTML = (round + 1);
+      aRound.innerHTML = (round + 1) + ": " + unescape(gameOb.rounds[round].roundInfo.roundName);
       aRound.addEventListener('click', function(evt){
         let newRoundNumber = parseInt(evt.target.getAttribute('round-number'))
         console.log("round: " + newRoundNumber);
         currentRound = newRoundNumber;
         state.current_display_state = "main_board";
-        changeOverlayState();
         createJeopardyTable(newRoundNumber);
+        changeOverlayState();
 
       });
       roundNumberDiv.appendChild(aRound);
@@ -414,7 +414,6 @@ function initializeInstructorWindowContent(){
   writeToGameLog();
 
 }
-
 
 
 function initializeInstructorWindowWithGameInformation(str1, str2, str3){

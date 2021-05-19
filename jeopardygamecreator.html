@@ -2,12 +2,12 @@
 <html>
 <head>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-bootstrap/0.5pre/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="game-creator.css">
-    <script type="text/javascript" src="jcomposer.js"></script>
+    <link rel="stylesheet" href="scripts/game-creator.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="scripts/jcomposer2.js"></script>
 
 
 
@@ -80,26 +80,32 @@
             </div>
             <div><button class='roundInfoInputField' type="button" id="createCategory" onclick='createCategory()'>New Category</button></div>
           </li>
-          <li>
-            <div>Final Jeopardy Included: </div>
-            <div><input class='roundInfoInputField' id='finalJeopardyIncludedCheckbox' onchange='saveAllFields()' type="checkbox" /></div>
-          </li>
-          <li>
-            <div>Final Jeopardy Answer: </div>
-            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalAnswerField' onchange='saveAllFields()' placeholder='final answer at end of round'></textarea></div>
-          </li>
-          <li>
-            <div>Final Jeopardy Question: </div>
-            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalQuestionField' onchange='saveAllFields()' placeholder='final question at end of round'></textarea></div>
-          </li>
-          <li>
-            <div>Final Jeopardy Source: </div>
-            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalSourceField' onchange='saveAllFields()' placeholder='final source at end of round'></textarea></div>
-          </li>
-          <li>
-            <div>Final Jeopardy Comments: </div>
-            <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalCommentsField' onchange='saveAllFields()' placeholder='comments on final question/answer'></textarea></div>
-          </li>
+          <div id="fj-div">
+            <h3>Final Jeopardy Information</h3>
+            <ul>
+            <li>
+              <div>Final Jeopardy Included: </div>
+              <div><input class='roundInfoInputField' id='finalJeopardyIncludedCheckbox' onchange='saveAllFields()' type="checkbox" /></div>
+            </li>
+            <li>
+              <div>Final Jeopardy Answer: </div>
+              <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalAnswerField' onchange='saveAllFields()' placeholder='final answer at end of round'></textarea></div>
+            </li>
+            <li>
+              <div>Final Jeopardy Question: </div>
+              <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalQuestionField' onchange='saveAllFields()' placeholder='final question at end of round'></textarea></div>
+            </li>
+            <li>
+              <div>Final Jeopardy Source: </div>
+              <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalSourceField' onchange='saveAllFields()' placeholder='final source at end of round'></textarea></div>
+            </li>
+            <li>
+              <div>Final Jeopardy Comments: </div>
+              <div><textarea rows="4" cols="50" class='roundInfoInputField' id='finalCommentsField' onchange='saveAllFields()' placeholder='comments on final question/answer'></textarea></div>
+            </li>
+            </ul>
+          </div>
+          
         </ul>
         <ul>
           <div id='finalGrid'>
@@ -111,37 +117,41 @@
 
     <div id="category_data">
       <h3>Data</h3>
-      <div>
-        <ul>
-          <li>
+        <div id="qa-whole-container">
+          <div class="qa-container" id="qa-top-container">
+          <div>
             <div>Points: </div>
             <div><input class='QAInputField' id='qaPoints' onchange='saveQAdata()' type="field" /></div>
-          </li>
-                    <li>
+          </div>
+          <div>
             <div>Timer (in seconds): </div>
             <div><input class='QAInputField' id='qaTimerInSeconds' onchange='saveQAdata()' type="field" value="30"/></div>
-          </li>
-          <li>
-            <div>Answer: </div>
-            <div><textarea rows="4" cols="50" class='QAInputField' id='qaAnswer' onchange='saveQAdata()' type="field" placeholder="Type answer here."></textarea></div>
-          </li>
-          <li>
-            <div>Question: </div>
-            <div><textarea rows="4" cols="50" class='QAInputField' id='qaQuestion' onchange='saveQAdata()' type="field" placeholder="type question here."></textarea></div>
-          </li>
-          <li>
-            <div>Source: </div>
-            <div><textarea rows="4" cols="50" class='QAInputField' id='qaSource' onchange='saveQAdata()' type="field" placeholder="Where was the answer found? What source?."></textarea></div>
-          </li>
-                    <li>
-            <div>Comments: </div>
-            <div><textarea rows="4" cols="50" class='QAInputField' id='qaComments' onchange='saveQAdata()' type="field" placeholder="type question/answer helps, hints, comments, etc."></textarea></div>
-          </li>
-          <li>
+          </div>
+          <div>
             <div>Daily Double: </div>
             <div><input class='QAInputField' id='qaDailyDouble' onchange='saveQAdata()' type="checkbox" /></div>
-          </li>
-        </ul>
+          </div>
+        </div>
+        <div class="qa-container" id="qa-middle-container">
+          <div>
+            <div>Answer: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaAnswer' onchange='saveQAdata()' type="field" placeholder="Type answer here."></textarea></div>
+          </div>
+          <div>
+            <div>Question: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaQuestion' onchange='saveQAdata()' type="field" placeholder="type question here."></textarea></div>
+          </div>
+        </div>
+        <div class="qa-container" id="qa-bottom-container">
+          <div>
+            <div>Source: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaSource' onchange='saveQAdata()' type="field" placeholder="Where was the answer found? What source?."></textarea></div>
+          </div>
+          <div>
+            <div>Comments: </div>
+            <div><textarea rows="4" cols="50" class='QAInputField' id='qaComments' onchange='saveQAdata()' type="field" placeholder="type question/answer helps, hints, comments, etc."></textarea></div>
+          </div>
+        </div>
       </div>
     </div>
 </body>

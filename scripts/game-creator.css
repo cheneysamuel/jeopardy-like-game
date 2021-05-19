@@ -47,6 +47,7 @@ th.qa_title {
 
 .qa_item:hover {
     filter: brightness(160%);
+    background-color: rgb(92, 74, 255);
 }
 
 .qa_item.selected {
@@ -91,5 +92,15 @@ th.qa_title {
     border-radius: 30px;
     line-height: 1;
     text-align: center;
+}
+
+.qa-container {
+    display: flex;
+    flex-flow: row;
+}
+
+.QAInputField {
+    margin: 10px;
+    padding: 4px;
 }
 

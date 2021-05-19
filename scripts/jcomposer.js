@@ -19,7 +19,11 @@ $(document).ready(function() {
     collapsible: true,
     heightStyle: "content"
   });
-
+  $("#fj-div").accordion({
+    active: false,
+    collapsible: true,
+    heightStyle: "content"
+  });
 
 
   // listen for the load file button:
@@ -55,21 +59,21 @@ $(document).ready(function() {
 
 var roundCounter = 1000;
 
-var currRound = -1;
+var currRound = 0;
 
 let currQA = {};
-
 
 
 class GameOb {
   constructor() {
     this.gameInfo = new GameInfoOb();
     this.rounds = [];
-
-    this.addRound = function () {
-      this.rounds.push(new roundOb(roundCounter, new roundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
-      roundCounter++;
-    };
+    this.addRound = function(){
+      this.rounds.push(new RoundOb(roundCounter, new RoundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
+    }
+    // this.addRound = function () {
+    //   this.rounds.push(new RoundOb(roundCounter, new RoundInfoOb("Round 1", 2, ["Category 1", "Category 2"]), []));
+    // };
   }
 }
 
@@ -85,20 +89,20 @@ class GameInfoOb {
 }
 
 
-class roundOb {
+class RoundOb {
   constructor(id, info, data) {
     this.roundID = id;
     this.roundInfo = info;
     this.categories = [];
 
     this.addCategory = function () {
-      this.categories.push(new categoryOb("New Category"));
+      this.categories.push(new CategoryOb("New Category"));
     };
   }
 }
 
 
-class roundInfoOb {
+class RoundInfoOb {
   constructor(_roundName, _numOfQuestionRows) {
     this.roundName = _roundName;
     this.numberOfQuestionRows = _numOfQuestionRows;
@@ -108,7 +112,7 @@ class roundInfoOb {
 }
 
 
-class categoryOb {
+class CategoryOb {
   constructor(_title) {
     this.title = _title;
     this.qaObs = [];
@@ -145,18 +149,17 @@ class finalJ {
 
 
 
-let gameOb = new GameOb(); // "ET1", "now", "none.", [0,0,255], [0,0,0]
+let gameOb = new GameOb; // "ET1", "now", "none.", [0,0,255], [0,0,0]
 
 
 function showFile() {
   //	alert("showFile called...");
 
-
   var preview = document.getElementById('title');
 
   var file = document.querySelector('input[type=file]').files[0];
 
-  var reader = new FileReader()
+  var reader = new FileReader();
 
   var textFile = /text.*/;
 
@@ -165,13 +168,14 @@ function showFile() {
 
       // once successfully loaded, purge the gameOb and all fields:
 
-      //		gameOb = new GameOb();
+  		// gameOb = new GameOb();
 
       purgeAll();
 
-      Object.assign(gameOb, JSON.parse(event.target.result));
+      let parsedOb = JSON.parse(event.target.result);
 
-
+      Object.assign(gameOb, parsedOb);
+      //Object.assign(gameOb, parsedOb);
 
       // load the round data:
 
@@ -203,7 +207,7 @@ function populateFromLoadedGameOb() {
   for (var i = 0; i < gameOb.rounds.length; i++) {
     if (gameOb.rounds[i].roundID > roundCounter) {
       roundCounter = gameOb.rounds[i].roundID;
-      //				alert("roundCounter: " + roundCounter + ", roundID: " + gameOb.rounds[i].roundID);
+      		//		alert("roundCounter: " + roundCounter + ", roundID: " + gameOb.rounds[i].roundID);
     }
   }
 
@@ -220,16 +224,11 @@ function populateRoundsFromFile() {
 
   // empty out the rounds:
 
-
+  // empty the rounds section to get ready for refresh:
   $("#rounds").empty();
 
-  //	alert("emptied the rounds.");
-
-  // using the gameOb, count the number of rounds:
-
-  var roundsThisGame = gameOb.rounds.length;
-
-  for (var i = 0; i < roundsThisGame; i++) {
+  // add a DOM li for each round we have in gameOb:
+  for (var i = 0; i < gameOb.rounds.length; i++) {
 
     // for every round, we need its name:
     console.log("creating round for: " + gameOb.rounds[i].roundID);
@@ -241,6 +240,9 @@ function populateRoundsFromFile() {
 
 
 function button_createRound(theRoundID) {
+
+  roundCounter++;
+  console.log("roundCounter(beginning): " + roundCounter);
 
   var thisRoundID = 0;
 
@@ -254,17 +256,47 @@ function button_createRound(theRoundID) {
 
     //roundCounter++;
 
+    // set the roundID:
+    if(gameOb.rounds.length > 0){
+      let highestID = gameOb.rounds[0].roundID;
+      for(let rnd = 0; rnd < gameOb.rounds.length; rnd++){
+        if(gameOb.rounds[rnd].roundID > highestID){
+          highestID = gameOb.rounds[rnd].roundID;
+        }
+      }
+      highestID++;
+      roundCounter = highestID;
+      console.log("highestID: " + highestID);
+    }
+    else{
+      roundCounter = 1000;
+      console.log("roundCounter reset to 1000");
+    }
+
+    console.log("roundCounter: " + roundCounter);
+
     thisRoundID = roundCounter;
 
     // auto-populate the name:
     nameOfRound = roundCounter;
 
     // add a round to the gameOb:
+    if(gameOb instanceof GameOb){
+      gameOb.addRound();
+    }
+    else{
+      gameOb.rounds.push(new RoundOb(roundCounter, new RoundInfoOb("Round Name", 2, ["Category 1", "Category 2"]), []));
+    }
 
-    gameOb.addRound();
 
-    // set the roundID:
-    gameOb.rounds[gameOb.rounds.length - 1].roundID = roundCounter;
+
+    // gameOb.rounds[gameOb.rounds.length - 1].roundID = roundCounter;
+    // let hightestID = gameOb.rounds[0]
+    // gameOb.rounds[gameOb.rounds.length - 1].roundID = gameOb.rounds.max
+
+    // increment the round counter:
+    //roundCounter++;
+    console.log("roundCounter: " + roundCounter);
 
   } else {
     // a file is being loaded.  set the ID to be the roundID from the gameOb:
@@ -293,7 +325,7 @@ function button_createRound(theRoundID) {
   editButton.id = "reb" + roundCounter;
   editButton.innerHTML = "edit";
   editButton.addEventListener("click", function(){
-    button_editRoundItem(this.id);
+    button_editRoundItem(this);
   });
 
   let deleteButton = document.createElement("button");
@@ -468,16 +500,22 @@ function purgeRoundInfo() {
 }
 
 
-function button_editRoundItem(theID) {
+function button_editRoundItem(ob) {
 
-    console.log("editing round " + theID);
+    
 
   //	alert($("#"+theID).parent().attr('id'));
   //	alert("theID: " + theID);
   // open the round information accordion pane:
   $("#round_information").accordion("option", "active", 0);
 
-  var obIndex = $("#" + theID).parent().index();
+  //var obIndex = $("#" + theID).parent().index();
+
+  let obIndex = gameOb.rounds.findIndex(function(roundID, i){
+    return gameOb.rounds[i].roundID == ob.parentElement.id;
+  });
+
+  console.log("editing round: " + ob.parentElement.id + ", obIndex: " + obIndex);
 
   //	alert("obIndex: " + obIndex);
   //	alert("index: " + obIndex);
@@ -743,7 +781,7 @@ function exportText() {
 
 function createCategory() {
 
-  //	alert("attempting to create a category...");
+  	console.log("attempting to create a category...");
 
   //	alert("currRound: " + currRound);
 
@@ -759,7 +797,7 @@ function createCategory() {
   var newInputField = document.createElement("input");
   
   newInputField.type = "field";
-  newInputField.value = "Example Category";
+
   
   newInputField.onfocusout = function(){saveAllFields()};
   
@@ -782,9 +820,11 @@ function createCategory() {
 
   // due to the changing nature of the round information pane, you need to add the category into the array asap:
   //var titleStr = "<div class='categoryField' id='round" + currRound + "cat" + catPos + "'><input type='field' value='Example Category'/><button id='ceb" + currRound + "_" + catPos + "' type='button' onclick='removeCategory(" + currRound + ", " + catPos + ", this.id)'>Delete</button></div>";
-
+  // 
   // now add it to the actual array:
-  gameOb.rounds[currRound].addCategory();
+  gameOb.rounds[currRound].addCategory("New Category");
+
+  newInputField.value = gameOb.rounds[currRound].categories[gameOb.rounds[currRound].categories.length-1].title;
 
   // add the category item into the list:
   //$(titleStr).appendTo("#colTitlesList");
