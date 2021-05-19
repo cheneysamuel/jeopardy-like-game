@@ -16,16 +16,24 @@ div {
 
 .round-number-div {
   height: 40px;
-  width: 40px;
+  width: 130%;
   font-size: 30px;
   background-color: blue;
   padding: 10px;
-  margin: 16px;
   border-radius: 40px;
 }
 
 .round-number-div:hover {
   background-color: rgb(24, 67, 255);
+}
+
+.round-number-div.selected-round {
+  background-color: rgb(23, 104, 255);
+}
+
+.round-number-div.selected-round:hover {
+  background-color: rgb(24, 67, 255);
+  ;
 }
 
 .aq-title-div {
@@ -39,6 +47,10 @@ div {
   padding: 10px;
   font-size: 20px;
   text-align: left;
+}
+
+.round-info-field {
+  display:flex;
 }
 
 .bottom-div {

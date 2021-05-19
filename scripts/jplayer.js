@@ -188,6 +188,7 @@ let gameOb = new GameOb(); // "ET1", "now", "none.", [0,0,255], [0,0,0]
 let currentRound = 0;
 
 let gameLog = new LogOb();
+state.file_states = "game_not_loaded";
 
 
 function toggleTitle(){
@@ -228,6 +229,8 @@ function showFile() {
 
       Object.assign(gameOb, JSON.parse(event.target.result));
 
+      state.file_states = "game_loaded";
+
       writeToGameLog("Game file loaded.", eventTypes.GAME);
 
       // load the round data:
@@ -258,10 +261,11 @@ function openInstructorWindow(){
 
     }
 
+
     initializeInstructorWindowContent();
 
     //toggleTitle();
-
+    
     let infoOb = gameOb.gameInfo;
 
     // load the gameInfo information:
@@ -285,7 +289,7 @@ function initializeInstructorWindowContent(){
   let cssSource = instructorWindow.document.createElement("link");
   cssSource.type = "text/css";
   cssSource.rel = "stylesheet";
-  cssSource.href = "instructor-window.css";
+  cssSource.href = "scripts/instructor-window.css";
   instructorWindow.document.head.appendChild(cssSource);
 
   let topInfo = instructorWindow.document.createElement("div");
@@ -328,10 +332,14 @@ function initializeInstructorWindowContent(){
 
     for(let round = 0; round < gameOb.rounds.length; round++){
       console.log("creating clickable round element...");
-      let aRound = instructorWindow.document.createElement("span");
+      let aRound = instructorWindow.document.createElement("div");
       aRound.classList.add("round-number-div");
       aRound.setAttribute('round-number', round);
-      aRound.innerHTML = (round + 1) + ": " + unescape(gameOb.rounds[round].roundInfo.roundName);
+      aRound.innerHTML = (round + 1) + ":" + unescape(gameOb.rounds[round].roundInfo.roundName);
+      if(round == currentRound){
+        // this is the current round. color it red:
+        aRound.classList.add('selected-round');
+      }
       aRound.addEventListener('click', function(evt){
         let newRoundNumber = parseInt(evt.target.getAttribute('round-number'))
         console.log("round: " + newRoundNumber);
@@ -632,7 +640,7 @@ function playQA(row, col, ob){
       // instructor clicked on the QA cell, play it.  
 
       // load the question and points onto the overlay:
-      document.getElementById("overlay-points").innerHTML = currentQA.points;
+      document.getElementById("overlay-points").innerHTML = unescape(gameOb.rounds[currentRound].categories[currentCategory].title) + ": " + currentQA.points;
       document.getElementById("overlay-answer").innerHTML = unescape(currentQA.answer);
       document.getElementById("overlay-question").innerHTML = unescape(currentQA.question);
       document.getElementById("overlay-source").innerHTML = unescape(currentQA.source);
@@ -949,7 +957,7 @@ function changeOverlayState(){
       sourceDiv.innerHTML = unescape(currentQA.source);
       if(!gameOb.rounds[currentRound].categories[currentCategory].qaObs[currentRow].isDailyDouble){
         // it's a daily double.  don't show points as the team/individual will wager:
-        pointsDiv.innerHTML = currentQA.points;
+        pointsDiv.innerHTML = unescape(gameOb.rounds[currentRound].categories[currentCategory].title) + ": " + currentQA.points;
       }
     break;
     case "show_daily_double":
