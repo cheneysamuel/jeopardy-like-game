@@ -250,8 +250,10 @@ function showFile() {
 function updateOverlayColors(){
 	// apply the colors noted in the game file to the overlay:
 	let overlayOb = document.getElementById("overlay-box");
-	overlayOb.style.backgroundColor = gameOb.gameInfo.backgroundColor;
-	overlayOb.style.color = gameOb.gameInfo.fontColor;
+
+	overlayOb.style.backgroundColor = unescape(gameOb.gameInfo.backgroundColor);
+	overlayOb.style.color = unescape(gameOb.gameInfo.fontColor);
+
 }
 
 
@@ -550,8 +552,8 @@ function createJeopardyTable(roundNum) {
         let newTitle = document.createElement("th");
         newTitle.classList.add("qa_title");
         newTitle.style.width = (100.0/cols) + "%";
-	newTitle.style.backgroundColor = gameOb.gameInfo.backgroundColor;
-	newTitle.style.color = gameOb.gameInfo.fontColor;
+	newTitle.style.backgroundColor = unescape(gameOb.gameInfo.backgroundColor);
+	newTitle.style.color = unescape(gameOb.gameInfo.fontColor);
         newTitle.innerHTML = unescape(gameOb.rounds[roundNum].categories[tc].title);
         newRow.appendChild(newTitle);
       }
@@ -560,8 +562,8 @@ function createJeopardyTable(roundNum) {
         let newItem = document.createElement("td");
         newItem.classList.add("qa_item");
         newItem.classList.add("incomplete");
-	newItem.style.backgroundColor = gameOb.gameInfo.backgroundColor;
-	newItem.style.color = gameOb.gameInfo.fontColor;
+	newItem.style.backgroundColor = unescape(gameOb.gameInfo.backgroundColor);
+	newItem.style.color = unescape(gameOb.gameInfo.fontColor);
         newItem.innerHTML = gameOb.rounds[currentRound].categories[tc].qaObs[tr-1].points;
         newItem.addEventListener('click', function(){
           console.log("clicked on cell");
