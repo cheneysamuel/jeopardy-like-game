@@ -73,7 +73,6 @@ body {
 th.qa_title {
     padding: 10px;
     margin: 6px;
-    background-color: blue;
     border-radius: 15px;
     min-height: 64px;
     line-height: 1;
@@ -81,9 +80,7 @@ th.qa_title {
 }
 
 td.qa_item {
-    color: white;
     padding: 10px;
-    background-color: blue;
     border-radius: 15px;
 }
 
@@ -112,7 +109,6 @@ td.qa_item {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,1.0);
     z-index: 2;
     cursor: pointer;
 }
@@ -122,17 +118,19 @@ td.qa_item {
 }
 
 #aq-information {
-    background-color: black;
 }
 
 .overlay-item {
     font-size: 3rem;
+    width: 70%;
     margin: 20px;
     padding: 30px;
-    border: solid lightblue 4px;
+    border: solid rgb(0,0,0,0) 4px;
     border-radius: 30px;
     line-height: 1;
     text-align: center;
 }
+
+
 
 
