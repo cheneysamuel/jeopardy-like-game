@@ -9,6 +9,8 @@ body {
     display: flex;
     flex-flow: row;
     background-color: gray;
+    justify-content: center;
+    align-items: center;
     border-radius: 20px;
     padding: 4px;
     margin: 4px;
@@ -21,7 +23,7 @@ body {
 }
 
 .icon_period {
-    font-size: 40px;
+    font-size: 24px;
 }
 
 .icon_period:hover {
@@ -132,4 +134,5 @@ td.qa_item {
     line-height: 1;
     text-align: center;
 }
+
 
