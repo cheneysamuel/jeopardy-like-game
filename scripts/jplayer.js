@@ -224,8 +224,9 @@ function showFile() {
     reader.onload = function(event) {
 
       // once successfully loaded, purge the gameOb and all fields:
-
       gameOb = new GameOb();
+      // reset the rounds to 0:
+      currentRound = 0;
 
       Object.assign(gameOb, JSON.parse(event.target.result));
 
