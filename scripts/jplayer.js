@@ -433,7 +433,10 @@ function initializeInstructorWindowContent(){
   bottomDiv.appendChild(QAdiv);
 
   instructorWindow.document.body.appendChild(bottomDiv);
-
+	
+  // set the instructor window screen to full-screen:
+  instructorWindow.resizeTo(instructorWindow.screen.width, instructorWindow.screen.height);
+	
   writeToGameLog();
 
 }
